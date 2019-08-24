@@ -1,0 +1,16 @@
+{
+  "name": "tradecore-web",
+  "description": "TradeCore On Web",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "eslint": "^4.7.0",
+    "express": "^4.15.4",
+    "firebase-admin": "^5.2.1",
+    "firebase-functions": "^0.6.3",
+    "grpc": "^1.4.1"
+  },
+  "devDependencies": {
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-import": "^2.7.0"
+  }
+}

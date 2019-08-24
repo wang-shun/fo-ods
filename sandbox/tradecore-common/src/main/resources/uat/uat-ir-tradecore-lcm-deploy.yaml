@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: uat-ir-tradecore-lcm
+  labels:
+    app: uat-ir-tradecore-lcm
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: uat-ir-tradecore-lcm
+
+    spec:
+      containers:
+      - name: uat-ir-tradecore-service
+        # Replace [GCLOUD_PROJECT] with your project ID.
+        image: eu.gcr.io/fo-ods/tradecore-servicelayer:v1
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "600Mi"
+            cpu: "500m"
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+
+        # The traderepository process listens on port 8080 for web traffic by default.
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 443
+        - name: grpc
+          containerPort: 3000
+        env:
+        - name: SERVICE_HTTP_PORT
+          value: "8080"
+        - name: PROJECT_ID
+          value: "fo-ods"
+        - name: ULT_SUB_ID
+          value: "uat-ir-ult-feed-lcm-sub"
+        - name: DLT_PUBSUB_TOPIC
+          value: "uat-ir-lcm-feed"
+        - name: PUBSUB_TOPIC
+          value: "uat-ir-ult-feed"
+        - name: GRPC_PORT
+          value: "3000"
+        - name: CRUD_HOST
+          value: "104.199.76.36"
+        - name: CRUD_PORT
+          value: "3002"
+        - name: SUBSCRIBER_THREADS
+          value: "2"
+        - name: RUNULTPUB_SUB
+          value: "Y"

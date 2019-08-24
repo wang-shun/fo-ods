@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: eq-ult-job
+  labels:
+    app: eq-ult
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  completions: 16
+  parallelism: 16
+  template:
+    spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: default-pool
+
+      containers:
+      - name: ult
+        image: gcr.io/fo-ods/tradecore-ult:roman
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1000m"
+          limits:
+            memory: "2Gi"
+            cpu: "1500m"
+        args: ["java", "-cp", "app.jar", "foods.ult.pubsub.UltMain",
+               "50000", "cash-eq", "2", "2", "roman-ult-eq", "2059", "4"]
+        #146.148.116.205
+        #35.195.88.22
+        env:
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx2g -Xms1g"
+        #- name: JAVA_USER_OPTS
+          #value: "-XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+        #  value: "-XX:+PrintFlagsFinal"
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+      restartPolicy: Never

@@ -1,0 +1,71 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: eqtradecore-lcm
+  labels:
+    app: eqtradecore-lcm
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  replicas: 4
+
+  template:
+    metadata:
+      labels:
+        app: eqtradecore-lcm
+
+    spec:
+#      nodeSelector:
+#        cloud.google.com/gke-nodepool: pool-1
+      containers:
+      - name: eqtradecore-service
+        # Replace [GCLOUD_PROJECT] with your project ID.
+        image: eu.gcr.io/fo-ods/tradecore-servicelayer:roman
+
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "2Gi"
+            #cpu: "4000m"
+          limits:
+            memory: "4Gi"
+            #cpu: "4000m"
+        args: ["java", "-cp", "app.jar", "com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PubsubForwarderMain",
+               "roman-ult-eq-sub-lcm-ggg", "4", "roman-dlt-eq-aaa"]
+        # The traderepository process listens on port 8080 for web traffic by default.
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 443
+        - name: grpc
+          containerPort: 3000
+        env:
+        - name: SERVICE_HTTP_PORT
+          value: "8080"
+        - name: PROJECT_ID
+          value: fo-ods
+        - name: ULT_SUB_ID
+          value: roman-ult-eq-sub-lcm-fff
+        - name: DLT_PUBSUB_TOPIC
+          value: roman-dlt-eq
+        - name: GRPC_PORT
+          value: "3000"
+        - name: CRUD_HOST
+          value: "35.195.201.187"
+        - name: CRUD_PORT
+          value: "3002"
+        - name: SUBSCRIBER_THREADS
+          value: "10"
+        - name: RUNULTPUB_SUB
+          value: "Y"
+        - name: STORE_SERVICE_NAME
+          value: "MockTradeStoreService"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx4g -Xms2g"

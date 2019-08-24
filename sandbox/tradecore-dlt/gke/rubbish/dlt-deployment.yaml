@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: dltstatus
+  labels:
+    app: dltstatus
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: dltstatus
+
+    spec:
+      containers:
+      - name: dltstatus
+        # Replace [GCLOUD_PROJECT] with your project ID.
+        image: gcr.io/fo-ods/tradecore-dlt:v1
+
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+        args: ["java", "-cp", "app.jar", "foods.dlt.stats.StatsMain", "fo-ods", "dltsubscription", "tradecore-stats", "statsdb2", "true"]
+        env:
+        - name: DLT_PUBSUB_FAILQUEUE_TOPIC
+          value: "dltrejectpullpubsubtopic"
+        - name: PUBSUB_TOPIC
+          value: "ultpullpubsubtopic"
+        - name: INSTANCEID
+          value: "tradecore-stats"
+        - name: DATABASEID
+          value: "statsdb2"
+        - name: DLT_PUBSUB_SUBCRIBE
+          value: "dltsubscription"
+        - name: SIM_UPSTREAM
+          value: "true"
+        - name: IGNORE_ERROR
+          value: "true"
+        - name: SUCCESS_RATE
+          value: "0.9"

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Initiate Bulk Amend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Loading Bootstrap -->
+    <link href="flat-ui/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="TradeCore Web">
+    <meta name="theme-color" content="#303F9F">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TradeCore Web">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#303F9F">
+
+    <!-- Tile icon for Win8 -->
+    <meta name="msapplication-TileColor" content="#3372DF">
+    <meta name="msapplication-navbutton-color" content="#303F9F">
+
+    <!-- Material Design Lite -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css">
+    <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+    <!-- App Styling -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="styles/tradecore.css">
+    <link rel="stylesheet" href="styles/trade-order.css">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.3/es6-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js"></script>
+
+    <script type="text/javascript" src="./scripts/bulk-amend-init.js" charset="utf-8"></script>
+    <style>
+        .tablink {
+            background-color: #555;
+            color: white;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            font-size: 17px;
+            width: 25%;
+        }
+
+        .tablink:hover {
+            background-color: #777;
+        }
+        /* Style the tab content */
+
+        .tabcontent {
+            color: white;
+            display: none;
+            padding: 50px;
+            text-align: center;
+        }
+
+        #Pre {
+            background-color: red;
+        }
+
+        #Post {
+            background-color: green;
+        }
+    </style>
+    <!-- Loading Bootstrap -->
+    <!--link href="flat-ui/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"-->
+
+    <!-- Loading Flat UI -->
+    <link href="flat-ui/css/flat-ui.min.css" rel="stylesheet">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/vendor/html5shiv.js"></script>
+      <script src="js/vendor/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div class="container-fluid orderPanel" id="bulkAmendDetailsContainer">
+        <!--div class="row HomeDemo-main"-->
+            <!--div class="container palette-midnight-blue whiteFont"-->
+                <form class="form" action="/initiateBulkAmend" method="post" name="actionBulkAmendForm" id="actionBulkAmendForm">
+                <input id="hdnTenor" name="hdnTenor" type="hidden" value="" />
+                <input id="hdnStartDate" name="hdnStartDate" type="hidden" value="" />
+                <input name="hdnUserName" id="hdnUserName" type="hidden" value="" />
+                <input id="hdnBulkAmendType" name="hdnBulkAmendType" type="hidden" value="" />
+                
+                <div class="container">                                                                                                                
+                <div style="width: 100%; clear: both; padding-top: 15px">     
+                    
+                        <div class="col-md-6">As of Date</div>                    
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input id="txtAsOfDate" name="txtAsOfDate" type="text" value="" class="form-control" onfocusout="fnCalcAsOfate()"/>
+                            </div>
+                        </div>
+                    
+                        <div id="tcBulkAmendInitiate">
+                                <div class="col-md-6">Book</div>                    
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input id="txtTradeBook" name="txtTradeBook" type="text" value="" placeholder="Book" class="form-control" />
+                                    </div>
+                                </div>
+                                
+                                <div class="col-xs-12"></div>
+                                
+                                <div class="col-md-6">Symbol</div>                    
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input id="txtInstrumentId" name="txtInstrumentId" type="text" value="" placeholder="Symbol" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        <div id="splitBulkAmendInitiate">
+                            <div class="col-md-6">Symbol</div>                    
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input id="txtInstrumentId1" name="txtInstrumentId1" type="text" value="" placeholder="Symbol" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12"></div>
+                            
+                            <div class="col-md-6">Split Ratio</div>                    
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input id="txtSplitRatio" name="txtSplitRatio" type="text" value="" placeholder="Split Ratio" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                            <div class="col-xs-12">&nbsp;</div>                        
+                            <div class="col-md-12" style="text-align: right">
+                                <input type="button" id="btnInitiate" class="btn btn-lg btn-danger" value="Initiate" onclick="javascript:submit();" />
+                            </div>
+                            <div class="col-xs-12">&nbsp;</div>    
+                        </div>                
+                    </div>
+                </div>
+                </form>
+    <!-- /.container -->
+    <!-- jQuery (necessary for Flat UI's JavaScript plugins) -->
+    <script src="flat-ui/js/vendor/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="flat-ui/js/flat-ui.min.js"></script>
+    <script src="flat-ui/js/application.js"></script>
+    <script src="scripts/bulk-amend-initiate.js"></script>
+</body>

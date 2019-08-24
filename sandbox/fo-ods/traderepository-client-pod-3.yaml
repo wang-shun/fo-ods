@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traderepository-client-pod-2
+  labels:
+    app: traderepository-client-pod
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  containers:
+  - name: traderepository
+    # Replace [GCLOUD_PROJECT] with your project ID.
+    image: gcr.io/fo-ods/traderepository-client
+
+    # This setting makes nodes pull the docker image every time before
+    # starting the pod. This is useful when debugging, but should be turned
+    # off in production.
+    imagePullPolicy: Always
+    env:
+      - name: TRADE_REPO_SVC_NAME
+        value: TRADEREPOSITORY
+      - name: TRADE_COUNT
+        value: "5000"
+  restartPolicy: Never

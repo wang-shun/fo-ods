@@ -1,0 +1,1 @@
+kubectl get pods -a -l 'job-name=eq-ult-job' -w

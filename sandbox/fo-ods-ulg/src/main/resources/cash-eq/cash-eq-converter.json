@@ -1,0 +1,164 @@
+{
+  "attributes": [
+    {
+      "family": "headers",
+      "qualifier": "odsTradeId",
+      "type": "sequence"
+    },
+    {
+      "family": "headers",
+      "qualifier": "odsVersion",
+      "type": "fixed",
+      "value": "1"
+    },
+    {
+      "family": "headers",
+      "qualifier": "odsTimestamp",
+      "type": "timestamp"
+    },
+    {
+      "family": "headers",
+      "qualifier": "tradeDate",
+      "type": "straight-pull",
+      "name": "tradeDate"
+    },
+    {
+      "family": "headers",
+      "qualifier": "primaryAssetClass",
+      "type": "straight-pull",
+      "name": "assetClass"
+    },
+    {
+      "family": "headers",
+      "qualifier": "osTradeId",
+      "type": "straight-pull",
+      "name": "sequenceNumber"
+    },
+    {
+      "family": "headers",
+      "qualifier": "osTradeVersion",
+      "type": "straight-pull",
+      "name": "version"
+    },
+    {
+      "family": "headers",
+      "qualifier": "osVersionStatus",
+      "type": "straight-pull",
+      "name": "bookingStatus"
+    },
+    {
+      "family": "headers",
+      "qualifier": "book",
+      "type": "straight-pull",
+      "name": "ptsFolioId"
+    },
+    {
+      "family": "headers",
+      "qualifier": "orderId",
+      "type": "straight-pull",
+      "name": "emsOrderId"
+    },
+    {
+      "family": "headers",
+      "qualifier": "exchangeExecutionId",
+      "type": "straight-pull",
+      "name": "exchangeExecutionId"
+    },
+    {
+      "family": "product",
+      "qualifier": "RIC",
+      "type": "straight-pull",
+      "name": "symbol"
+    },
+    {
+      "family": "product",
+      "qualifier": "currency",
+      "type": "straight-pull",
+      "name": "currency"
+    },
+    {
+      "family": "product",
+      "qualifier": "exchange",
+      "type": "straight-pull",
+      "name": "market"
+    },
+    {
+      "family": "product",
+      "qualifier": "cfiCode",
+      "type": "straight-pull",
+      "name": "cfiCode"
+    },
+    {
+      "family": "product",
+      "qualifier": "quantity",
+      "type": "straight-pull",
+      "name": "quantityFilled"
+    },
+    {
+      "family": "product",
+      "qualifier": "price",
+      "type": "straight-pull",
+      "name": "price"
+    },
+    {
+      "family": "product",
+      "qualifier": "grossPrice",
+      "type": "straight-pull",
+      "name": "amount"
+    },
+    {
+      "family": "event",
+      "qualifier": "type",
+      "type": "fixed",
+      "value": "new"
+    },
+    {
+      "family": "event",
+      "qualifier": "executionTimestamp",
+      "type": "straight-pull",
+      "name": "executionTime"
+    },
+    {
+      "family": "event",
+      "qualifier": "oboPartyRef",
+      "type": "straight-pull",
+      "name": "ptsEntityId"
+    },
+    {
+      "family": "event",
+      "qualifier": "counterpartyRef",
+      "type": "straight-pull",
+      "name": "ptsCouterpartyId"
+    },
+    {
+      "family": "party",
+      "qualifier": "trader",
+      "type": "straight-pull",
+      "name": "username"
+    },
+    {
+      "family": "party",
+      "qualifier": "party1",
+      "type": "straight-pull",
+      "name": "ptsEntityId"
+    },
+    {
+      "family": "party",
+      "qualifier": "party2",
+      "type": "straight-pull",
+      "name": "ptsCouterpartyId"
+    },
+    {
+      "family": "regulatory",
+      "qualifier": "rpTrader",
+      "type": "straight-pull",
+      "name": "username"
+    },
+    {
+      "family": "regulatory",
+      "qualifier": "rpTraderCountry",
+      "type": "fixed",
+      "value": "UK"
+    }
+  ]
+}

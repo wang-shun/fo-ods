@@ -1,0 +1,103 @@
+package com.maplequad.fo.ods.tradecore.lcm.subscriber;
+
+import java.io.IOException;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.maplequad.fo.ods.tradecore.client.service.GsonWrapper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.maplequad.fo.ods.tradecore.lcm.processor.TradeProcessorInterface;
+
+//@Controller
+public class LifeLoaderPubSubSubsriber {
+	private static final Logger LOGGER = LoggerFactory.getLogger(LifeLoaderPubSubSubsriber.class);
+	private final Gson gson = new Gson();
+	private final JsonParser jsonParser = new JsonParser();
+	ObjectMapper mapper = new ObjectMapper();
+	ApplicationContext context=null;
+	
+	TradeProcessorInterface myProcessor=null;
+	
+	//TradeConverterService myConvertor=null;
+	
+	String pubsubVerificationToken=null;
+	
+	public LifeLoaderPubSubSubsriber() throws Exception{
+		
+		pubsubVerificationToken = System.getenv("PUBSUB_VERIFICATION_TOKEN");
+		prepareToken(pubsubVerificationToken);
+	}
+	
+	public LifeLoaderPubSubSubsriber(String token)throws Exception{
+		prepareToken(token);
+	}
+	private void prepareToken(String token) throws Exception{
+		context = new ClassPathXmlApplicationContext("SpringBean.xml");
+		myProcessor = context.getBean("TradeProcessor", TradeProcessorInterface.class);
+		
+		
+		pubsubVerificationToken =token;
+		
+		if(pubsubVerificationToken==null){
+			throw new Exception("Server failed to get pubsub verification token from env variable: 'PUBSUB_VERIFICATION_TOKEN'");
+		}
+		
+	}
+	
+	
+	@RequestMapping(value = "/pubsub/push", method = RequestMethod.POST)
+	public ResponseEntity<String> runTradeImport(HttpServletRequest req) throws Exception {
+		
+		
+		
+	    // Do not process message if request token does not match pubsubVerificationToken
+	    if (req.getParameter("token").compareTo(pubsubVerificationToken) != 0) {
+	      return new ResponseEntity< String >("not matching token", HttpStatus.BAD_REQUEST);
+	    }
+	    // parse message object from "message" field in the request body json
+	    // decode message data from base64
+	    Message message = getMessage(req);
+		String jsonStr = message.getData();
+		
+		List< Map<String, String> > map = this.processJsonStr(jsonStr);    
+		myProcessor.processTradeFromMap(map);
+		
+		return new ResponseEntity< String >("DONE", HttpStatus.OK);
+	}
+
+	public List< Map<String, String> > processJsonStr(String jsonStr) throws Exception{
+		List<Map <String, String> >map = gson.fromJson(jsonStr, List.class);
+		return map;
+	}
+	
+	
+	private Message getMessage(HttpServletRequest request) throws IOException {
+		String requestBody = request.getReader().lines().collect(Collectors.joining("\n"));
+		JsonElement jsonRoot = jsonParser.parse(requestBody);
+		String messageStr = jsonRoot.getAsJsonObject().get("message").toString();
+		Message message = gson.fromJson(messageStr, Message.class);
+		// decode from base64
+		String decoded = decode(message.getData());
+		message.setData(decoded);
+		return message;
+	}
+
+	public String decode(String data) {
+		return new String(Base64.getDecoder().decode(data));
+	}
+}

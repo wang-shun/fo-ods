@@ -1,0 +1,16 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model;
+
+message TradeQuery {
+    oneof queryType {
+        string byTradeId = 1;
+        string byOsTradeId = 2;
+        string byInstrumentId = 3;
+        QueryByBookAndInstrumentId byBookInstrumentId = 4;
+    }
+}
+
+message QueryByBookAndInstrumentId {
+    string instrumentId = 1;
+    string bookId = 2;
+}

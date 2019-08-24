@@ -1,0 +1,19 @@
+runtime: java
+#use this for docker
+#runtime: custom
+env: flex
+service: fo-ods-tradecore-loadgen
+threadsafe: true
+handlers:
+  - url: '/.*'
+    script: 'this field is required, but ignored'
+#   secure: always - not supported in apf
+runtime_config:  # Optional
+  jdk: openjdk8
+  server: jetty9
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 10
+  cool_down_period_sec: 120 # default value
+  cpu_utilization:
+    target_utilization: 0.5

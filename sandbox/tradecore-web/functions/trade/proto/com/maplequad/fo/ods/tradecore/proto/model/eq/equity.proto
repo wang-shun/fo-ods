@@ -1,0 +1,35 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model.eq;
+
+import "../../google/protobuf/timestamp.proto";
+
+//Equity
+message Equity {
+
+    //Primary Key
+    string tradeId = 1;
+    google.protobuf.Timestamp validTimeFrom = 2;
+    google.protobuf.Timestamp validTimeTo = 3;
+    google.protobuf.Timestamp transactionTimeFrom = 4;
+    google.protobuf.Timestamp transactionTimeTo = 5;
+    int64 legNumber = 6;
+
+    //Common Attributes
+    string legType = 7;
+    string book = 8;
+    string internalProductType = 9;
+    string internalProductRef = 10;
+    string instrumentId = 11;
+    string ric = 12;
+    string isin = 13;
+    string currency = 14;
+    string exchange = 15;
+    string buySellInd = 16;
+
+    //Cash Equities Attributes
+    string cfiCode = 17;
+    int64 quantity = 18;
+    float price = 19;
+    float grossPrice = 20;
+
+}

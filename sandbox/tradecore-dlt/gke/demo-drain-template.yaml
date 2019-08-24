@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: drain-$VARIANT
+  labels:
+    app: drain
+
+spec:
+  replicas: $REPLICAS
+
+  template:
+    metadata:
+      labels:
+        app: drain
+
+    spec:
+      containers:
+      - name: drain
+        image: gcr.io/fo-ods/tradecore-dlt:$TAG
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "400m"
+          limits:
+            memory: "1Gi"
+            cpu: "800m"
+        args: ["java", "-cp", "app.jar", "foods.dlt.pubsub.SimpleMain" , "fo-ods", "$SUBSCRIPTION", "20"]
+        env:
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx1g -Xms200m"

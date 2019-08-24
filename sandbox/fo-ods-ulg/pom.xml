@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2017
+-->
+<!-- [START pom] -->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.maplequad.fo.ods</groupId>
+    <artifactId>fo-ods-ulg</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <!--packaging>war</packaging-->
+    <packaging>jar</packaging>
+    <description>ODS Upstream Load Generator</description>
+
+    <!-- [START properties] -->
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+        <failOnMissingWebXml>false</failOnMissingWebXml> <!-- REQUIRED -->
+        <appengine.maven.plugin>1.3.1</appengine.maven.plugin>
+        <jetty.maven.plugin>9.4.3.v20170317</jetty.maven.plugin>
+        <com.google.appengine>1.9.54</com.google.appengine>
+        <com.google.truth>0.34</com.google.truth>
+        <junit.version>4.12</junit.version>
+        <mockito.version>2.8.47</mockito.version>
+        <commons-io.version>2.5</commons-io.version>
+        <jsoniter-version>0.9.15</jsoniter-version>
+        <bigtable-hbase-version>1.0.0-pre2</bigtable-hbase-version>
+        <netty-ssl-version>1.1.33.Fork26</netty-ssl-version>
+        <commons-logging-version>1.2</commons-logging-version>
+        <slf4j-simple-version>1.7.25</slf4j-simple-version>
+        <metrics.version>3.2.3</metrics.version>
+    </properties>
+    <!-- [END properties] -->
+
+    <dependencies>
+        <!-- Compile/runtime dependencies -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jsoniter</groupId>
+            <artifactId>jsoniter</artifactId>
+            <version>${jsoniter-version}</version>
+        </dependency>
+        <!--dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20170516</version>
+        </dependency-->
+        <dependency>
+            <groupId>com.google.cloud.bigtable</groupId>
+            <artifactId>bigtable-hbase-1.x</artifactId>
+            <version>${bigtable-hbase-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-tcnative-boringssl-static</artifactId>
+            <version>${netty-ssl-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+        <!-- [START log-dependencies] -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons-logging-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j-simple-version}</version>
+        </dependency>
+        <!-- [END log-dependencies] -->
+        <!-- [START api-dependencies] -->
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-1.0-sdk</artifactId>
+            <version>${com.google.appengine}</version>
+        </dependency>
+        <!-- [END api-dependencies] -->
+        <dependency>
+            <groupId>javax.servlet</groupId><!-- Java Servlet API -->
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope><!-- Provided by the Jetty Servlet Container -->
+        </dependency>
+        <!-- [START_EXCLUDE] -->
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-testing</artifactId>
+            <version>${com.google.appengine}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-stubs</artifactId>
+            <version>${com.google.appengine}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-tools-sdk</artifactId>
+            <version>${com.google.appengine}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <version>${com.google.truth}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- [END_EXCLUDE] -->
+    </dependencies>
+
+    <build>
+        <!--resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources-->
+        <plugins>
+            <!-- [START cloudplugin] -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>appengine-maven-plugin</artifactId>
+                <version>${appengine.maven.plugin}</version>
+                <configuration>
+                </configuration>
+            </plugin>
+            <!-- [END cloudplugin] -->
+            <plugin><!-- Used for local debugging -->
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.maven.plugin}</version>
+            </plugin>
+            <!-- [START_EXCLUDE] -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <createDependencyReducedPom>true</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.maplequad.fo.ods.ulg.app.UpstreamLoadGen</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- [END_EXCLUDE] -->
+        </plugins>
+    </build>
+</project>
+        <!-- [END pom] -->

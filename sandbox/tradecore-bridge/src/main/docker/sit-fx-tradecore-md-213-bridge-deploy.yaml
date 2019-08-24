@@ -1,0 +1,59 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: sit-fx-tradecore-md-213-bridge
+  labels:
+    app: sit-fx-tradecore-md-213-bridge
+
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sit-fx-tradecore-md-213-bridge
+    spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: pubsub-auth-key
+      containers:
+      - name: sit-xa-tradecore-md-bridge
+        image: gcr.io/fo-ods/tradecore-bridge
+        volumeMounts:
+          - name: google-cloud-key
+            mountPath: /var/secrets/google
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        env:
+        - name: APP_ID
+          value: "sit-fx-tradecore-md-213-bridge"
+        - name: SRC_PROJECT_ID
+          value: "tr-ems-integration"
+        - name: SRC_TOPIC_NAME
+          value: "PE213"
+        - name: DEST_PROJECT_ID
+          value: "fo-ods"
+        - name: DEST_TOPIC_NAME
+          value: "reuters-market-data-fx"
+        - name: SRC_TOPIC_SUBS_NAME
+          value: "reuters-market-data-fx-213-sub"
+        - name: ACK_DEADLINE_IN_SECONDS
+          value: "600"
+        - name: BLOCKING_QUEUE_SIZE
+          value: "20000"
+        - name: NO_OF_EXEC_THREADS
+          value: "1"
+        - name: TXN_LOGGING_FLAG
+          value: "false"
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: "/var/secrets/google/key.json"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx500m -Xms200m"
+        - name: JAVA_USER_OPTS
+          value: "-XX:+PrintFlagsFinal"

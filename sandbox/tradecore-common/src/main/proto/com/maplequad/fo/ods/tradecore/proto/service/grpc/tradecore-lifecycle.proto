@@ -1,0 +1,75 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.service.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.maplequad.fo.ods.tradecore.proto.service.grpc";
+option java_outer_classname = "TradeCoreLifeCycleService";
+option objc_class_prefix = "LC";
+
+import "google/protobuf/timestamp.proto";
+import "com/maplequad/fo/ods/tradecore/proto/model/trade.proto";
+
+// Interface exported by the server.
+service TradeCoreLifeCycle {
+    // Creates New Trade(s).
+    rpc CreateTrade (CreateTradeSTDRequest) returns (CreateTradeSTDResponse) {
+    }
+    // Return all trades matching the criteria.
+    rpc ReadTrade (ReadTradeSTDRequest) returns (ReadTradeSTDResponse) {
+    }
+    // Update Trade(s).
+    rpc UpdateTrade (UpdateTradeSTDRequest) returns (UpdateTradeSTDResponse) {
+    }
+}
+
+message LCTrackLogProto {
+    int64 serialNumber = 1;
+    int32 numOfTrades = 2;
+    int32 subnumber = 3;
+    google.protobuf.Timestamp ULT_requestTimestamp = 4;
+    google.protobuf.Timestamp LC_arrivalTime = 5;
+    google.protobuf.Timestamp LC_CRUDStartTime = 6;
+    google.protobuf.Timestamp DB_StartTime = 7;
+    google.protobuf.Timestamp DB_EndTime = 8;
+    google.protobuf.Timestamp LC_CRUDEndTime = 9;
+    string tradeid = 10;
+    string osTradeid = 11;
+    string action = 12;
+
+}
+
+message CreateTradeSTDRequest {
+    com.maplequad.fo.ods.tradecore.proto.model.Trade trade = 1;
+    LCTrackLogProto trackLog = 2;
+}
+
+message CreateTradeSTDResponse {
+    com.maplequad.fo.ods.tradecore.proto.model.Trade trade = 1;
+    google.protobuf.Timestamp dsStartTimestamp = 2;
+    google.protobuf.Timestamp dsFinishTimestamp = 3;
+    string status = 4;
+}
+
+message ReadTradeSTDRequest {
+    repeated string tradeId = 1;
+    com.maplequad.fo.ods.tradecore.proto.model.Trade trade = 2;
+}
+
+message ReadTradeSTDResponse {
+    repeated com.maplequad.fo.ods.tradecore.proto.model.Trade trades = 1;
+    google.protobuf.Timestamp dsStartTimestamp = 2;
+    google.protobuf.Timestamp dsFinishTimestamp = 3;
+}
+
+message UpdateTradeSTDRequest {
+    repeated com.maplequad.fo.ods.tradecore.proto.model.Trade trades = 1;
+    string action = 2;
+    LCTrackLogProto trackLog = 3;
+}
+
+message UpdateTradeSTDResponse {
+    repeated com.maplequad.fo.ods.tradecore.proto.model.Trade trades = 1;
+    google.protobuf.Timestamp dsStartTimestamp = 2;
+    google.protobuf.Timestamp dsFinishTimestamp = 3;
+    string status = 4;
+}

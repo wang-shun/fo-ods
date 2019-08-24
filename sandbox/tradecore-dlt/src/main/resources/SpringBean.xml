@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+	<import resource="SpringBeanStateDiagram.xml" />
+
+	<bean id="propertyPlaceholderConfigurer"
+		  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="searchSystemEnvironment" value="true" />
+	</bean>
+
+	<bean id="FailPubMessageHelper"
+		class="foods.dlt.pubsub.PubMessageHelper">
+
+		<constructor-arg type="java.lang.String" value="${DLT_PUBSUB_FAILQUEUE_TOPIC}" />
+	</bean>
+
+	<bean id="MainPubMessageHelper"
+		  class="foods.dlt.pubsub.PubMessageHelper">
+
+		<constructor-arg type="java.lang.String" value="${PUBSUB_TOPIC}" />
+	</bean>
+
+
+	<bean id="StatsDao"
+		  class="foods.dlt.stats.StatsDao">
+
+		<constructor-arg type="java.lang.String" value="${INSTANCEID}" />
+		<constructor-arg type="java.lang.String" value="${DATABASEID}" />
+	</bean>
+
+	<bean id="StatsSubscriber"
+		  class="foods.dlt.stats.StatsSubscriber">
+
+		<constructor-arg type="boolean" value="${SIM_UPSTREAM}" />
+		<constructor-arg type="boolean" value="${IGNORE_ERROR}" />
+		<constructor-arg type="boolean" value="${DISABLE_METRIC:false}" />
+		<property name="subscriptionId" value="${DLT_PUBSUB_SUBCRIBE}" />
+		<property name="dao" ref="StatsDao" />
+		<property name="backOfficeProcesser" ref="BackOfficeProcesser"/>
+
+	</bean>
+
+	<bean id="BackOfficeProcesser"
+		  class="foods.dlt.processor.BackOfficeProcesser">
+		<property name="mainPublisher" ref="MainPubMessageHelper"/>
+		<property name="failPublisher" ref="FailPubMessageHelper"/>
+		<property name="successRate"  value="${SUCCESS_RATE}"/>
+
+		<property name = "actionApprovalScope">
+			<list>
+				<value>CREATE</value>
+				<value>SAVE</value>
+				<value>TERM</value>
+				<value>BULK_TERM</value>
+				<value>BULK_WRITE</value>
+			</list>
+		</property>
+
+		<property name="approvalMap">
+			<map>
+				<entry key = "CREATE" value = "APPROVE"/>
+				<entry key = "SAVE" value = "APPROVE"/>
+				<entry key = "FTERM" value = "APPROVE"/>
+				<entry key = "PTERM" value = "APPROVE"/>
+				<entry key = "CANCEL" value = "APPROVE"/>
+			</map>
+
+		</property>
+
+		<property name="rejectMap">
+			<map>
+				<entry key = "CREATE" value = "REJECT"/>
+				<entry key = "SAVE" value = "REJECT"/>
+				<entry key = "FTERM" value = "REJECT"/>
+				<entry key = "PTERM" value = "REJECT"/>
+				<entry key = "CANCEL" value = "REJECT"/>
+			</map>
+		</property>
+
+		<property name="transitionFactory" ref="StateTransitionGraphFactory"/>
+	</bean>
+</beans>
+
+

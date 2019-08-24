@@ -1,0 +1,330 @@
+-- published 1000 trades from ULT:
+2017-08-22 10:40:04.180  INFO 1 --- [ taskExecutor-1] c.f.l.l.Operator.TradeHelper             : Processed:1trades
+2017-08-22 10:40:10.275  INFO 1 --- [ taskExecutor-1] c.f.l.l.Operator.TradeHelper             : Processed:1000trades
+
+6 seconds, avg = 6ms
+
+messages received on PubSub side:
+-- initial delay: 700ms, then faster
+10:40:04.919 [pool-12-thread-29] INFO  c.f.l.l.s.PullLifeLoaderPubSubService - Received message!
+
+last message procesed:
+-- 1 minute later
+-- this is because the lifecycle processor is single-threaded
+10:41:04.130 [main] INFO  c.f.l.l.p.GrpcSpannerServiceProcessor - Save trade to grpc service finish:OperationCREATE TradeId4441168037218766107 Productcash-eq
+10:41:04.131 [main] INFO  c.f.l.l.p.GrpcSpannerServiceProcessor - DLT: published to queue4441168037218766107
+
+tradeId	            osTradeid	        action	ult	                        lcStart	                    ultToLcTime	lcCrudStart	                lcCrudEnd	                lcCrudTime	dbStart	                    dbEnd	                    dbTime	lcToDbTime	lcTime      statsStart                  lcToDltTime totalTime
+4441168037218766107	4441168037218766107	CREATE	2017-08-22T10:40:10.275Z	2017-08-22T10:41:04.107Z	53832	    2017-08-22T10:41:04.107Z	2017-08-22T10:41:04.13Z	    23          2017-08-22T10:41:04.109Z	2017-08-22T10:41:04.129Z	20      2           23          2017-08-22T10:41:04.244Z	114	        53969
+
+10:57:54.397 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=HISTOGRAM, name=dbTime, count=1010, min=18, max=655, mean=34.60378728238893, stddev=20.302324766443697, median=27.0, p75=35.0, p95=77.0, p98=93.0, p99=108.0, p999=186.0
+10:57:54.397 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=HISTOGRAM, name=lcCrudTime, count=1010, min=22, max=664, mean=48.11244195568956, stddev=28.42610225228001, median=35.0, p75=62.0, p95=97.0, p98=124.0, p99=157.0, p999=200.0
+10:57:54.397 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=HISTOGRAM, name=lcTime, count=1010, min=22, max=665, mean=48.53578921382426, stddev=28.527457935640754, median=36.0, p75=63.0, p95=97.0, p98=125.0, p99=157.0, p999=200.0
+10:57:54.400 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=HISTOGRAM, name=lcToDbTime, count=1010, min=1, max=93, mean=5.110019985270366, stddev=10.379554290884878, median=2.0, p75=4.0, p95=15.0, p98=54.0, p99=61.0, p999=87.0
+10:57:54.400 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=HISTOGRAM, name=lcToDltTime, count=1010, min=15, max=5266, mean=123.57885735541434, stddev=164.20188637119432, median=114.0, p75=131.0, p95=285.0, p98=306.0, p99=354.0, p999=1248.0
+10:57:54.401 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=HISTOGRAM, name=totalTime, count=1010, min=1582, max=53969, mean=36512.600876452816, stddev=13516.541734777153, median=39751.0, p75=47932.0, p95=53039.0, p98=53696.0, p99=53819.0, p999=53969.0
+10:57:54.401 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=HISTOGRAM, name=ultToLc, count=1010, min=128, max=53832, mean=36340.48622988352, stddev=13570.183966922274, median=39636.0, p75=47861.0, p95=52923.0, p98=53531.0, p99=53707.0, p999=53832.0
+10:57:54.401 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=METER, name=errors, count=0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second
+10:57:54.401 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsMain - type=METER, name=requests, count=1010, mean_rate=0.46756621659006425, m1=5.643731262060454E-7, m5=0.10645136157328527, m15=0.35406242359465434, rate_unit=events/second
+
+
+
+-------- lifecycle processor has 100 threads in pubsub subscriber
+-- the bottleneck is still on DB size as the trade store is single threaded
+tradeId	osTradeid	action	ult	lcStart	ultToLcTime	lcCrudStart	lcCrudEnd	lcCrudTime	dbStart	dbEnd	dbTime	lcToDbTime	lcTime	statsStart	lcToDltTime	totalTime
+1707909267496847772	1707909267496847772	CREATE	2017-08-22T11:16:09.584Z	2017-08-22T11:17:56.594Z	107010	2017-08-22T11:17:56.594Z	2017-08-22T11:17:59.043Z	2449	2017-08-22T11:17:59.016Z	2017-08-22T11:17:59.04Z	24	2422	2449	2017-08-22T11:17:59.134Z	91	109550
+
+
+-------- lifecycle service and repository each have 10 threads
+
+
+
+
+
+-------------- perf test
+1000 msgs, 1 thread, 0 delay
+16:57:25.454 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=1000, delay=0
+16:57:27.112 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+16:57:27.334 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+16:57:29.235 [pool-4-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - Data: 1503421023014;1503421023766
+16:57:31.666 [pool-4-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - Data: 1503421023014;1503421023775
+16:58:27.219 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=1966, min=562.0, max=1643.0, mean=967.597667233167, stddev=236.8918397969486, median=1148.0, p75=1200.0, p95=1220.0, p98=1230.0, p99=1233.0, p999=1284.0, mean_rate=32.70785105130038, m1=157.2208840883941, m5=327.33530887888224, m15=369.8905966413847, rate_unit=events/second, duration_unit=milliseconds
+16:58:27.216 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=1966, min=435.0, max=28052.0, mean=13699.642175304802, stddev=12711.36497876948, median=2422.0, p75=26611.0, p95=27322.0, p98=27910.0, p99=27977.0, p999=28051.0, mean_rate=32.70947883074458, m1=157.2208840883941, m5=327.33530887888224, m15=369.8905966413847, rate_unit=events/second, duration_unit=milliseconds
+16:58:27.223 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=1966, min=1618.0, max=28712.0, mean=14682.48764038611, stddev=12467.010963739458, median=3603.0, p75=27339.0, p95=28638.0, p98=28678.0, p99=28711.0, p999=28712.0, mean_rate=32.70570723809457, m1=157.2208840883941, m5=327.33530887888224, m15=369.8905966413847, rate_unit=events/second, duration_unit=milliseconds
+
+
+17:11:03.472 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=1000, delay=0
+17:11:04.491 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+17:11:04.590 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+17:11:07.160 [pool-4-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - Data: 1503421864930;1503421865904
+.......
+17:11:07.615 [pool-4-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - Data: 1503421864935;1503421865869
+17:13:04.493 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=1000, min=1256.0, max=1746.0, mean=1539.9260000000056, stddev=121.32272880215025, median=1559.0, p75=1648.0, p95=1691.0, p98=1721.0, p99=1724.0, p999=1726.0, mean_rate=8.33309774436878, m1=29.419293478595396, m5=136.31713323876957, m15=176.00978476883418, rate_unit=events/second, duration_unit=milliseconds
+17:13:04.495 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=1000, min=930.0, max=1324.0, mean=992.1560000000064, stddev=36.88234894905722, median=986.0, p75=1028.0, p95=1050.0, p98=1051.0, p99=1055.0, p999=1056.0, mean_rate=8.33296783589242, m1=29.419293478595396, m5=136.31713323876957, m15=176.00978476883418, rate_unit=events/second, duration_unit=milliseconds
+17:13:04.497 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=1000, min=2230.0, max=2741.0, mean=2532.082000000011, stddev=117.55996459679739, median=2553.0, p75=2623.0, p95=2706.0, p98=2739.0, p99=2740.0, p999=2741.0, mean_rate=8.332834603807855, m1=29.419293478595396, m5=136.31713323876957, m15=176.00978476883418, rate_unit=events/second, duration_unit=milliseconds
+
+
+
+-------------- perf test
+1000 msgs, 1 thread, 100 delay
+17:01:40.187 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=1000, delay=100
+17:01:41.131 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+17:01:41.229 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+17:01:42.788 [pool-4-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - Data: 1503421301655;1503421302057
+..........
+17:03:21.948 [pool-4-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - Data: 1503421401681;1503421401825
+17:03:41.134 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=1003, min=5.0, max=827.0, mean=106.31302421730624, stddev=62.05087618923128, median=122.0, p75=138.0, p95=172.0, p98=244.0, p99=298.0, p999=502.0, mean_rate=8.358042934106694, m1=7.167412019305805, m5=8.966230114742634, m15=9.25889418402215, rate_unit=events/second, duration_unit=milliseconds
+17:03:41.132 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=1003, min=12.0, max=49251.0, mean=275.2887748447974, stddev=1829.2902570840636, median=116.0, p75=133.0, p95=857.0, p98=1539.0, p99=1901.0, p999=48703.0, mean_rate=8.35813385239942, m1=7.167412019305805, m5=8.966230114742634, m15=9.25889418402215, rate_unit=events/second, duration_unit=milliseconds
+17:03:41.135 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=1003, min=32.0, max=49355.0, mean=381.6017990621031, stddev=1829.789520802884, median=249.0, p75=277.0, p95=941.0, p98=1616.0, p99=1942.0, p999=48709.0, mean_rate=8.35793581130974, m1=7.167412019305805, m5=8.966230114742634, m15=9.25889418402215, rate_unit=events/second, duration_unit=milliseconds
+
+1:39
+
+
+--------------- sending 100k messages
+17:14:21.321 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=100000, delay=0
+17:14:22.311 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+17:14:22.414 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+17:14:24.488 [pool-4-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - Data: 1503422063041;1503422063865
+.......
+17:14:52.081 [pool-4-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - Data: 1503422063208;1503422089725
+17:15:22.317 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=119246, min=41.0, max=13774.0, mean=2897.6219127952186, stddev=2551.847683489519, median=2888.0, p75=4118.0, p95=7619.0, p98=9972.0, p99=10939.0, p999=13774.0, mean_rate=1987.1735270206939, m1=1725.083447827758, m5=2205.1660510670445, m15=2259.1983579873718, rate_unit=events/second, duration_unit=milliseconds
+17:15:22.320 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=119246, min=614.0, max=27036.0, mean=8995.565979787789, stddev=6447.770883984558, median=5925.0, p75=13548.0, p95=19763.0, p98=20316.0, p99=23061.0, p999=27036.0, mean_rate=1987.0808891675995, m1=1725.083447827758, m5=2205.1660510670445, m15=2259.1983579873718, rate_unit=events/second, duration_unit=milliseconds
+17:15:22.323 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=119246, min=1672.0, max=29378.0, mean=12224.968646815514, stddev=7383.538091770498, median=8739.0, p75=16416.0, p95=27350.0, p98=28349.0, p99=28800.0, p999=29378.0, mean_rate=1986.984617796373, m1=1724.8643871676484, m5=2204.6749513668456, m15=2258.6370712171147, rate_unit=events/second, duration_unit=milliseconds
+
+
+---
+macbook:dlt roman$
+macbook:dlt roman$
+macbook:dlt roman$ kc logs perf-resp --tail 3
+06:08:56.631 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+06:08:56.631 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+06:08:56.632 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=77437, min=1.0, max=1.0, mean=1.0000000000000067, stddev=6.7520886659622335E-15, median=1.0, p75=1.0, p95=1.0, p98=1.0, p99=1.0, p999=1.0, mean_rate=1.718530775048903, m1=2.964393875E-314, m5=1.6822267838427675E-63, m15=1.6071044357617483E-20, rate_unit=events/second, duration_unit=milliseconds
+
+macbook:dlt roman$ kc logs perf-req --tail 3
+06:09:14.544 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=123927, min=22.0, max=10118.0, mean=179.73942759833585, stddev=537.5969115293926, median=120.0, p75=151.0, p95=287.0, p98=805.0, p99=1436.0, p999=10118.0, mean_rate=2.7502662332984027, m1=2.964393875E-314, m5=1.066135979462136E-62, m15=2.745325073629129E-19, rate_unit=events/second, duration_unit=milliseconds
+06:09:14.544 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=123927, min=1445.0, max=35605.0, mean=14093.799448198528, stddev=5580.857965607266, median=14123.0, p75=17757.0, p95=23180.0, p98=25182.0, p99=29713.0, p999=35605.0, mean_rate=2.7502662094026427, m1=2.964393875E-314, m5=1.066135979462136E-62, m15=2.745325073629129E-19, rate_unit=events/second, duration_unit=milliseconds
+06:09:14.544 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=123927, min=3295.0, max=35713.0, mean=14465.855176229496, stddev=5704.553074849087, median=14963.0, p75=19257.0, p95=23337.0, p98=23674.0, p99=25338.0, p999=35713.0, mean_rate=2.7502661658685432, m1=2.964393875E-314, m5=1.0661361819197414E-62, m15=2.7453251412041124E-19, rate_unit=events/second, duration_unit=milliseconds
+
+
+macbook:dlt roman$ kc logs perf-resp --tail 3
+06:15:53.578 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+06:15:53.578 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+06:15:53.579 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=100000, min=1.0, max=1.0, mean=0.9999999999999934, stddev=6.519258022308345E-15, median=1.0, p75=1.0, p95=1.0, p98=1.0, p99=1.0, p999=1.0, mean_rate=416.6622952003777, m1=337.7338070791998, m5=242.1671438854645, m15=99.88422838258224, rate_unit=events/second, duration_unit=milliseconds
+macbook:dlt roman$
+macbook:dlt roman$
+macbook:dlt roman$
+macbook:dlt roman$ kc logs perf-req --tail 3
+06:17:09.467 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=100000, min=28.0, max=1043.0, mean=146.39344144769947, stddev=81.2474297375655, median=130.0, p75=149.0, p95=295.0, p98=365.0, p99=506.0, p999=918.0, mean_rate=555.5489008297146, m1=239.71889240990907, m5=1776.7299159404652, m15=2461.7209676397783, rate_unit=events/second, duration_unit=milliseconds
+06:17:09.471 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=100000, min=1989.0, max=11301.0, mean=7027.773725094327, stddev=2440.5144101314836, median=7367.0, p75=9255.0, p95=10274.0, p98=10901.0, p99=11002.0, p999=11301.0, mean_rate=555.5362713268173, m1=239.71889240990907, m5=1776.7299159404652, m15=2461.7209676397783, rate_unit=events/second, duration_unit=milliseconds
+06:17:09.472 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=100000, min=2648.0, max=11205.0, mean=7478.427451278491, stddev=2367.949489535308, median=7779.0, p75=9640.0, p95=10426.0, p98=11094.0, p99=11128.0, p999=11205.0, mean_rate=555.5311069586844, m1=239.71889240990907, m5=1776.7299159404652, m15=2461.7209676397783, rate_unit=events/second, duration_unit=milliseconds
+
+
+
+macbook:dlt roman$ kc logs perf-resp --tail 3
+06:27:55.664 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+06:27:55.664 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+06:27:55.665 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=100000, min=1.0, max=1.0, mean=1.000000000000001, stddev=1.0477378964424157E-15, median=1.0, p75=1.0, p95=1.0, p98=1.0, p99=1.0, p999=1.0, mean_rate=185.18403715766576, m1=0.3219022972550457, m5=60.22890400079633, m15=62.81339781526023, rate_unit=events/second, duration_unit=milliseconds
+
+macbook:dlt roman$ kc logs perf-req --tail 3
+06:27:08.674 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=100000, min=27.0, max=1966.0, mean=204.67152071406375, stddev=286.5863131806792, median=122.0, p75=147.0, p95=939.0, p98=1152.0, p99=1623.0, p999=1966.0, mean_rate=208.33227736863358, m1=1.0217123010729914, m5=260.84635563489445, m15=619.3924273069863, rate_unit=events/second, duration_unit=milliseconds
+06:27:08.679 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=100000, min=1320.0, max=19936.0, mean=13242.122266843131, stddev=4576.151231975374, median=14122.0, p75=17077.0, p95=19217.0, p98=19532.0, p99=19789.0, p999=19936.0, mean_rate=208.330174881218, m1=1.0217123010729914, m5=260.84635563489445, m15=619.3924273069863, rate_unit=events/second, duration_unit=milliseconds
+06:27:08.686 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=100000, min=1872.0, max=21731.0, mean=13338.356388535722, stddev=4520.280903392523, median=13897.0, p75=17203.0, p95=19443.0, p98=19921.0, p99=20661.0, p999=21731.0, mean_rate=208.32702432734757, m1=1.0217240122432265, m5=260.84657145497357, m15=619.392493954795, rate_unit=events/second, duration_unit=milliseconds
+
+
+
+macbook:dlt roman$ kc logs perf-req --tail 3
+07:16:15.541 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=607901, min=35.0, max=20780.0, mean=1369.703647518979, stddev=2883.7725302890967, median=128.0, p75=335.0, p95=7748.0, p98=10066.0, p99=14638.0, p999=20067.0, mean_rate=1266.4545769997585, m1=6.374297179326632, m5=482.075002010374, m15=473.66800895310917, rate_unit=events/second, duration_unit=milliseconds
+07:16:15.543 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=607901, min=1788.0, max=59502.0, mean=38608.55206987016, stddev=15492.198079092575, median=40204.0, p75=50009.0, p95=58209.0, p98=58575.0, p99=58942.0, p999=59502.0, mean_rate=1266.451118717635, m1=6.374298252018598, m5=482.07501526137827, m15=473.66801278126684, rate_unit=events/second, duration_unit=milliseconds
+07:16:15.544 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=607901, min=5635.0, max=64366.0, mean=40159.22724585189, stddev=14241.260303072642, median=42306.0, p75=50145.0, p95=60030.0, p98=62685.0, p99=63559.0, p999=64366.0, mean_rate=1266.446850728099, m1=6.374325031438431, m5=482.0754464138608, m15=473.6681435090036, rate_unit=events/second, duration_unit=milliseconds
+macbook:dlt roman$
+macbook:dlt roman$
+macbook:dlt roman$ kc logs perf-resp --tail 3
+07:16:42.766 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+07:16:42.766 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+07:16:42.767 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=440055, min=1.0, max=1.0, mean=0.9999999999999996, stddev=4.656612873077396E-16, median=1.0, p75=1.0, p95=1.0, p98=1.0, p99=1.0, p999=1.0, mean_rate=666.7474108854439, m1=2.92506652287477, m5=305.09194264146436, m15=289.61778949281467, rate_unit=events/second, duration_unit=milliseconds
+
+
+
+07:22:52.263 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-req, topic=perf-resp. leader=false, threads=1, msgCount=0, delay=0
+07:22:53.384 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+07:23:53.384 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=0
+
+macbook:dlt roman$ kc logs perf-resp --tail 3
+07:28:53.382 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+07:28:53.383 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=459930, min=1.0, max=1.0, mean=0.9999999999999899, stddev=1.0128132998943304E-14, median=1.0, p75=1.0, p95=1.0, p98=1.0, p99=1.0, p999=1.0, mean_rate=1277.5720687781206, m1=179.88953333604644, m5=723.5141700100588, m15=397.8592338284531, rate_unit=events/second, duration_unit=milliseconds
+07:28:53.386 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=459930
+
+
+
+07:24:56.511 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=500000, delay=0
+07:24:57.473 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+07:24:57.568 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+07:25:01.514 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Finished publishing
+
+macbook:dlt roman$ kc logs perf-req --tail 3
+07:28:57.474 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=518117, min=1086.0, max=24635.0, mean=8461.230772352541, stddev=4116.393083775227, median=7425.0, p75=11604.0, p95=15375.0, p98=18101.0, p99=19941.0, p999=24635.0, mean_rate=2158.790925677718, m1=251.52568052259105, m5=1989.8478478925213, m15=2449.689585994971, rate_unit=events/second, duration_unit=milliseconds
+07:28:57.475 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=518117, min=2229.0, max=29256.0, mean=13806.394020214399, stddev=4935.655560033407, median=13258.0, p75=17040.0, p95=22281.0, p98=26898.0, p99=27879.0, p999=29256.0, mean_rate=2158.7780396154017, m1=251.5271839875386, m5=1989.8491383641156, m15=2449.689825034507, rate_unit=events/second, duration_unit=milliseconds
+07:28:57.476 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=518117
+
+
+
+
+
+
+
+07:37:27.349 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=500000, delay=0
+07:37:28.588 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+07:37:28.745 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+07:37:32.226 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Finished publishing
+
+macbook:dlt roman$ kc logs perf-req --tail 3
+07:46:28.679 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=538713, min=1456.0, max=36306.0, mean=14288.113661194928, stddev=6643.430100869477, median=15010.0, p75=19476.0, p95=23546.0, p98=31220.0, p99=35356.0, p999=36306.0, mean_rate=997.4439741395548, m1=1.547169360087773, m5=390.7115599507093, m15=587.3942481376204, rate_unit=events/second, duration_unit=milliseconds
+07:46:28.679 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=538713
+07:46:28.681 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=538713, min=3009.0, max=38387.0, mean=16683.88138109256, stddev=6163.912406797915, median=16805.0, p75=20415.0, p95=29219.0, p98=35419.0, p99=36189.0, p999=38387.0, mean_rate=997.4384414659856, m1=1.5471853659098407, m5=390.71231003670067, m15=587.394518758935, rate_unit=events/second, duration_unit=milliseconds
+
+
+07:35:47.116 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-req, topic=perf-resp. leader=false, threads=1, msgCount=0, delay=0
+07:35:48.298 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+macbook:dlt roman$
+macbook:dlt roman$
+macbook:dlt roman$ kc logs perf-resp --tail 3
+07:45:48.295 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+07:45:48.296 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=457560, min=1.0, max=1.0, mean=0.9999999999999944, stddev=5.5879354476928594E-15, median=1.0, p75=1.0, p95=1.0, p98=1.0, p99=1.0, p999=1.0, mean_rate=762.5960139131773, m1=2.4172468491010135, m5=304.19780412220103, m15=297.0259417001469, rate_unit=events/second, duration_unit=milliseconds
+07:45:48.317 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=457560
+
+
+
+08:06:41.637 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-req, topic=perf-resp. leader=false, threads=1, msgCount=0, delay=0
+08:06:42.815 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+08:12:42.814 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+08:12:42.814 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=0, min=0.0, max=0.0, mean=0.0, stddev=0.0, median=0.0, p75=0.0, p95=0.0, p98=0.0, p99=0.0, p999=0.0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+08:12:42.815 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=500000, min=1.0, max=1.0, mean=0.9999999999999966, stddev=3.492459654808034E-15, median=1.0, p75=1.0, p95=1.0, p98=1.0, p99=1.0, p999=1.0, mean_rate=1388.8763443802789, m1=169.09752869047887, m5=757.8410447791805, m15=426.9905708928184, rate_unit=events/second, duration_unit=milliseconds
+08:12:42.817 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=500000
+
+
+08:07:50,843 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@2c8d66b2 - Registering current configuration as safe fallback point
+08:07:50.856 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=500000, delay=0
+08:07:51.865 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+08:07:51.971 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+08:09:17.287 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Finished publishing 500000 messages
+08:11:51.864 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=500000, min=20.0, max=839.0, mean=116.51350197393569, stddev=44.606135509916875, median=131.0, p75=145.0, p95=163.0, p98=173.0, p99=196.0, p999=356.0, mean_rate=2083.3151473809735, m1=412.8942468661013, m5=1308.7753066238822, m15=1151.358335591462, rate_unit=events/second, duration_unit=milliseconds
+08:11:51.865 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=500000, min=40.0, max=925.0, mean=108.60886936190641, stddev=37.699867627860385, median=108.0, p75=133.0, p95=157.0, p98=170.0, p99=190.0, p999=283.0, mean_rate=2083.303159108914, m1=412.8942468661013, m5=1308.7753066238822, m15=1151.358335591462, rate_unit=events/second, duration_unit=milliseconds
+08:11:51.866 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=500000, min=90.0, max=1213.0, mean=224.1425891811, stddev=60.42255002600097, median=225.0, p75=260.0, p95=303.0, p98=319.0, p99=363.0, p999=824.0, mean_rate=2083.289313629785, m1=412.8942468661013, m5=1308.7753066238822, m15=1151.358335591462, rate_unit=events/second, duration_unit=milliseconds
+08:11:51.868 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=500000
+
+
+
+08:19:32.587 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 1
+08:20:33.401 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 5000
+08:34:31.360 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=500000, min=14.0, max=4883.0, mean=1702.4797314637292, stddev=1642.9071140938354, median=1078.0, p75=3290.0, p95=4440.0, p98=4678.0, p99=4730.0, p999=4883.0, mean_rate=555.5540578497167, m1=0.005579252394715503, m5=220.32441962296946, m15=1149.5271157953807, rate_unit=events/second, duration_unit=milliseconds
+08:34:31.361 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=500000, min=23.0, max=274.0, mean=112.17709181055014, stddev=40.63364133933896, median=108.0, p75=136.0, p95=194.0, p98=217.0, p99=238.0, p999=274.0, mean_rate=555.553252035477, m1=0.005579252394715503, m5=220.32441962296946, m15=1149.5271157953807, rate_unit=events/second, duration_unit=milliseconds
+08:34:31.366 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=500000, min=95.0, max=4897.0, mean=1637.6783689279964, stddev=1603.3163113003193, median=995.0, p75=3149.0, p95=4524.0, p98=4717.0, p99=4800.0, p999=4897.0, mean_rate=555.5522928889142, m1=0.005579252394715503, m5=220.32441962296946, m15=1149.5271157953807, rate_unit=events/second, duration_unit=milliseconds
+08:34:31.382 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=500000
+
+
+
+08:35:09.558 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 1
+08:35:09.589 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 2
+08:35:09.593 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 3
+08:35:15.823 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 4998
+08:35:15.823 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 4999
+08:35:15.823 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 5000
+08:36:09.158 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=500000
+08:36:09.160 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=500000, min=102.0, max=13011.0, mean=6030.806900800955, stddev=2911.5408953801198, median=6897.0, p75=8762.0, p95=9515.0, p98=9870.0, p99=9952.0, p999=13011.0, mean_rate=8332.16514225563, m1=4817.044159709867, m5=3289.2305899834005, m15=2645.062721758953, rate_unit=events/second, duration_unit=milliseconds
+08:36:09.162 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=500000, min=774.0, max=10535.0, mean=6090.077186504233, stddev=2828.5909716222304, median=4795.0, p75=9705.0, p95=10251.0, p98=10379.0, p99=10425.0, p999=10535.0, mean_rate=8331.922879460471, m1=4817.043555751853, m5=3289.230542955549, m15=2645.0627159196815, rate_unit=events/second, duration_unit=milliseconds
+08:36:09.164 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=500000, min=1551.0, max=18507.0, mean=12516.036223518317, stddev=3826.585681903043, median=13093.0, p75=15287.0, p95=18018.0, p98=18252.0, p99=18330.0, p999=18507.0, mean_rate=8331.677680118984, m1=4817.044212196263, m5=3289.2305907737655, m15=2645.062721791484, rate_unit=events/second, duration_unit=milliseconds
+
+
+
+
+
+
+-------------- 500k
+08:44:32.809 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=5000000, delay=0
+08:44:34.154 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+08:44:34.950 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 1
+08:54:15.639 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 49999
+08:54:15.650 [main] INFO  foods.dlt.pubsub.TesterSubscriber - published batch 50000
+08:54:33.991 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=5000000, min=23.0, max=503.0, mean=121.43776442005938, stddev=49.63256269456256, median=132.0, p75=148.0, p95=180.0, p98=248.0, p99=267.0, p999=503.0, mean_rate=8333.302485669745, m1=6568.578157748023, m5=7540.6206755755475, m15=5956.690990932612, rate_unit=events/second, duration_unit=milliseconds
+08:54:33.992 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=5000000, min=42.0, max=533.0, mean=109.49227274731716, stddev=38.290308785834284, median=110.0, p75=131.0, p95=152.0, p98=170.0, p99=180.0, p999=505.0, mean_rate=8333.28641458361, m1=6568.582700975951, m5=7540.621603877764, m15=5956.691141601591, rate_unit=events/second, duration_unit=milliseconds
+08:54:33.993 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=5000000, min=69.0, max=663.0, mean=229.65432312574842, stddev=59.60443211961649, median=229.0, p75=266.0, p95=311.0, p98=349.0, p99=395.0, p999=663.0, mean_rate=8333.269035148893, m1=6568.654506154671, m5=7540.640483376347, m15=5956.694322909273, rate_unit=events/second, duration_unit=milliseconds
+08:54:33.997 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=5000000
+avg: ~1.2ms/msg
+
+------------ 50k / 1
+11:40:15.761 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=50000, delay=0, batchSize=1
+11:40:16.979 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+11:40:17.208 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+11:51:49.690 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Finished publishing 50000 messages
+11:52:17.024 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=50000
+11:52:17.025 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - SEQ=50000
+11:52:17.025 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - OUTOFORDER=1026
+11:53:16.979 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=50000, min=9.0, max=649.0, mean=104.29287664326428, stddev=42.18737230202565, median=111.0, p75=113.0, p95=119.0, p98=200.0, p99=224.0, p999=453.0, mean_rate=64.10234106561825, m1=17.195059623596233, m5=50.00424864596127, m15=39.34026761220384, rate_unit=events/second, duration_unit=milliseconds
+11:53:16.981 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=batch, count=50000, min=9.061966, max=65.856086, mean=13.650122512080415, stddev=5.125158752023271, median=12.170614, p75=13.651695, p95=22.93667, p98=33.278851, p99=39.464959, p999=55.584689, mean_rate=64.1022126280777, m1=17.14648423682371, m5=50.03699272308235, m15=39.67027382242903, rate_unit=events/second, duration_unit=milliseconds
+11:53:16.982 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=50000, min=12.0, max=297.0, mean=67.01067704000081, stddev=31.88161238357593, median=66.0, p75=91.0, p95=114.0, p98=117.0, p99=119.0, p999=138.0, mean_rate=64.10211615344258, m1=17.195059623596233, m5=50.00424864596127, m15=39.34026761220384, rate_unit=events/second, duration_unit=milliseconds
+11:53:16.983 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=50000, min=29.0, max=720.0, mean=171.1960805777814, stddev=52.608692682800545, median=171.0, p75=206.0, p95=228.0, p98=261.0, p99=313.0, p999=702.0, mean_rate=64.10199351165362, m1=17.19505968317889, m5=50.00427558324253, m15=39.340281792049716, rate_unit=events/second, duration_unit=milliseconds
+
+
+------------ 500k / 10
+09:50:32.305 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=500000, delay=0, batchSize=10
+09:50:33.934 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+09:58:46.864 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Finished publishing 500000 messages
+09:59:33.761 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=500000, min=13.0, max=233.0, mean=110.96587409230655, stddev=22.176128542610634, median=114.0, p75=115.0, p95=119.0, p98=143.0, p99=184.0, p999=233.0, mean_rate=925.9212296928863, m1=483.5259900656003, m5=732.4272185351891, m15=466.6629547515648, rate_unit=events/second, duration_unit=milliseconds
+09:59:33.763 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=500000, min=13.0, max=215.0, mean=69.67304503968154, stddev=30.678415948878907, median=71.0, p75=96.0, p95=115.0, p98=116.0, p99=117.0, p999=215.0, mean_rate=925.9171499031397, m1=483.5259900656003, m5=732.4272185351891, m15=466.6629547515648, rate_unit=events/second, duration_unit=milliseconds
+09:59:33.764 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=500000, min=33.0, max=270.0, mean=177.07733126579595, stddev=38.11947069709193, median=179.0, p75=207.0, p95=230.0, p98=233.0, p99=239.0, p999=270.0, mean_rate=925.9147673721303, m1=483.52610064279173, m5=732.42765831866, m15=466.6630599348084, rate_unit=events/second, duration_unit=milliseconds
+09:59:33.766 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=500000
+09:59:33.766 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - SEQ=500000
+10:00:33.767 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - OUTOFORDER=288057
+
+
+11:09:15.721 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=500000, delay=0, batchSize=10
+11:09:16.727 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+11:09:16.861 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+11:17:33.988 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Finished publishing 500000 messages
+11:18:16.734 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=500000
+11:18:16.734 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - SEQ=500000
+11:18:16.735 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - OUTOFORDER=295663
+11:19:16.727 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=500000, min=13.0, max=409.0, mean=108.47192465707442, stddev=22.91893428821267, median=114.0, p75=115.0, p95=118.0, p98=123.0, p99=131.0, p999=134.0, mean_rate=833.329974888535, m1=199.78731161339155, m5=606.7662921861415, m15=443.25729768349765, rate_unit=events/second, duration_unit=milliseconds
+11:19:16.728 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=batch, count=50000, min=5.805373, max=438.692546, mean=9.242556111622351, stddev=17.600567145929688, median=8.200993, p75=9.135635, p95=11.483669, p98=14.287077, p99=17.630137, p999=438.692546, mean_rate=83.33281327380112, m1=19.923474153932265, m5=60.69812227386167, m15=44.523990360998056, rate_unit=events/second, duration_unit=milliseconds
+11:19:16.729 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=500000, min=12.0, max=418.0, mean=67.83722458755123, stddev=30.801212413292454, median=67.0, p75=92.0, p95=114.0, p98=116.0, p99=118.0, p999=147.0, mean_rate=833.3265031240381, m1=199.78731161339155, m5=606.7662921861415, m15=443.25729768349765, rate_unit=events/second, duration_unit=milliseconds
+11:19:16.731 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=500000, min=35.0, max=313.0, mean=180.08815760698585, stddev=35.16539742718567, median=183.0, p75=208.0, p95=229.0, p98=233.0, p99=233.0, p999=270.0, mean_rate=833.3244353630653, m1=199.78899779554533, m5=606.7689379179774, m15=443.2578638912431, rate_unit=events/second, duration_unit=milliseconds
+
+
+----------- 500k / 100
+10:05:14.417 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=500000, delay=0, batchSize=100
+10:05:15.645 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+10:06:48.079 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Finished publishing 500000 messages
+10:07:15.473 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=500000
+10:07:15.473 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - SEQ=500000
+10:07:15.473 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - OUTOFORDER=424822
+10:07:15.474 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=batch, count=5000, min=6.659409, max=447.112732, mean=14.844008659427269, stddev=24.1546860486908, median=10.580763, p75=13.575457, p95=26.305942, p98=42.188854, p99=142.255268, p999=447.112732, mean_rate=41.66445050780947, m1=32.76830939555041, m5=17.133240855493042, m15=9.745766277552129, rate_unit=events/second, duration_unit=milliseconds
+10:07:15.476 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=500000, min=22.0, max=894.0, mean=105.30003208505535, stddev=37.32886045957912, median=105.0, p75=127.0, p95=154.0, p98=168.0, p99=180.0, p999=402.0, mean_rate=4166.3985853048935, m1=3282.75702463454, m5=1695.9385003026505, m15=950.8799807544742, rate_unit=events/second, duration_unit=milliseconds
+10:07:15.502 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=500000, min=95.0, max=429.0, mean=223.03603729381564, stddev=49.3682024507456, median=225.0, p75=257.0, p95=297.0, p98=315.0, p99=338.0, p999=406.0, mean_rate=4165.487287217739, m1=3282.8297274455676, m5=1695.945891443025, m15=950.8809401924948, rate_unit=events/second, duration_unit=milliseconds
+10:07:15.470 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=500000, min=22.0, max=265.0, mean=116.426700503068, stddev=39.0059079029594, median=131.0, p75=142.0, p95=161.0, p98=177.0, p99=189.0, p999=253.0, mean_rate=2777.7428351926465, m1=1207.6577053129527, m5=1388.5167533869856, m15=889.5548265241673, rate_unit=events/second, duration_unit=milliseconds
+
+
+------------ 50m / 100
+10:11:58.820 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=5000000, delay=0, batchSize=100
+10:11:59.928 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+10:12:00.090 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+10:23:59.928 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=5000000, min=20.0, max=196.0, mean=113.8581847653428, stddev=38.24708584282374, median=129.0, p75=141.0, p95=156.0, p98=164.0, p99=169.0, p999=187.0, mean_rate=6944.419712028671, m1=6281.1187693407555, m5=6483.461176381145, m15=4173.801898278088, rate_unit=events/second, duration_unit=milliseconds
+10:24:00.012 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=5000000
+10:24:00.013 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - SEQ=5000000
+10:24:00.013 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - OUTOFORDER=4217993
+10:24:00.014 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=5000000, min=18.0, max=235.0, mean=106.4242530741222, stddev=29.433791371625794, median=108.0, p75=130.0, p95=150.0, p98=156.0, p99=167.0, p999=200.0, mean_rate=6943.587087835141, m1=6281.121214308901, m5=6483.461660512386, m15=4173.801968508227, rate_unit=events/second, duration_unit=milliseconds
+10:24:00.016 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=5000000, min=86.0, max=915.0, mean=220.22036104622057, stddev=50.79885565555469, median=221.0, p75=256.0, p95=291.0, p98=301.0, p99=310.0, p999=559.0, mean_rate=6943.564867034063, m1=6281.167166671999, m5=6483.4737773859515, m15=4173.804401271923, rate_unit=events/second, duration_unit=milliseconds
+
+
+14:05:48.716 [main] INFO  foods.dlt.pubsub.TesterMain - Starting with project=fo-ods, subscription=perf-resp, topic=perf-req. leader=true, threads=1, msgCount=5000000, delay=0, batchSize=100
+14:05:50.303 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Starting subscriber...
+14:05:50.511 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Start publishing...
+14:16:48.190 [main] INFO  foods.dlt.pubsub.TesterSubscriber - Finished publishing 5000000 messages
+14:17:50.315 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - COUNTER=5000000
+14:17:50.315 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - SEQ=5000000
+14:17:50.315 [pool-9-thread-1] INFO  foods.dlt.pubsub.TesterSubscriber - OUTOFORDER=4278919
+14:18:50.303 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=back, count=5000000, min=17.0, max=9748.0, mean=4154.001078041345, stddev=4007.179886456639, median=4866.0, p75=8055.0, p95=9375.0, p98=9539.0, p99=9585.0, p999=9748.0, mean_rate=6410.235814670051, m1=1181.961032337886, m5=4841.199780505462, m15=3710.2683472278623, rate_unit=events/second, duration_unit=milliseconds
+14:18:50.304 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=batch, count=50000, min=7.230701, max=233.796945, mean=11.707275546042338, stddev=9.090167411846712, median=9.720476, p75=11.362168, p95=20.449256, p98=28.519898, p99=40.152277, p999=74.508449, mean_rate=64.10225987471802, m1=11.145242694388257, m5=48.17283908439169, m15=37.188361922422004, rate_unit=events/second, duration_unit=milliseconds
+14:18:50.308 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=there, count=5000000, min=14.0, max=269.0, mean=110.73364748846657, stddev=31.413179954246853, median=111.0, p75=134.0, p95=157.0, p98=176.0, p99=190.0, p999=269.0, mean_rate=6410.192202525122, m1=1181.9620020546713, m5=4841.200120201403, m15=3710.268402919955, rate_unit=events/second, duration_unit=milliseconds
+14:18:50.309 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.pubsub.TesterMain - type=TIMER, name=total, count=5000000, min=72.0, max=9932.0, mean=4395.064807525682, stddev=4031.216341417703, median=6020.0, p75=8581.0, p95=9510.0, p98=9651.0, p99=9782.0, p999=9932.0, mean_rate=6410.179297722512, m1=1181.9704526443038, m5=4841.205700719085, m15=3710.269421565484, rate_unit=events/second, duration_unit=milliseconds
+
+

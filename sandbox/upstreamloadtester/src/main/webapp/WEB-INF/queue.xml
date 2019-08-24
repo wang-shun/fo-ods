@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<queue-entries>
+<queue>
+    <name>bigtestqueue2</name>
+    <rate>500/s</rate>
+    <bucket-size>500</bucket-size>
+    <max-concurrent-requests>1000</max-concurrent-requests>
+  </queue>
+  <queue>
+    <name>bigtestqueue</name>
+    <rate>500/s</rate>
+    <bucket-size>500</bucket-size>
+    <max-concurrent-requests>1000</max-concurrent-requests>
+  </queue>
+  
+  <queue>
+    <name>midtestqueue</name>
+    <rate>500/s</rate>
+    <bucket-size>500</bucket-size>
+    <max-concurrent-requests>100</max-concurrent-requests>
+  </queue>
+  <queue>
+    <name>smalltestqueue</name>
+    <rate>500/s</rate>
+    <bucket-size>500</bucket-size>
+    <max-concurrent-requests>10</max-concurrent-requests>
+  </queue>
+</queue-entries>

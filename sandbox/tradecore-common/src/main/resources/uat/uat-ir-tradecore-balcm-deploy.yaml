@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: uat-ir-tradecore-balcm
+  labels:
+    app: uat-ir-tradecore-balcm
+
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: uat-ir-tradecore-balcm
+    spec:
+      containers:
+      - name: uat-ir-tradecore-balcm
+        image: gcr.io/fo-ods/tradecore-balcm-api
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        ports:
+        - name: grpc
+          containerPort: 5151
+        env:
+        - name: TC_PROJECT_ID
+          value: "fo-ods"
+        - name: TC_ASSET_CLASS
+          value: "ird"
+        - name: TC_FB_SRVC_ACCT_KEY
+          value: "src/main/resources/service-account/fo-ods-cred.json"
+        - name: TC_FB_DB_URL
+          value: "https://fo-ods.firebaseio.com"
+        - name: TC_FB_BASE_GRID
+          value: "irdBulkAmendGrid"
+        - name: TC_FB_AUTH_ID
+          value: "tradecore"
+        - name: TC_FB_AUTH_VALUE
+          value: "tradecore"
+        - name: TC_STORE_SRVC_HOST
+          value: "35.189.219.191"
+        - name: TC_STORE_SRVC_PORT
+          value: "3002"
+        - name: TC_BALCM_SRVC_PORT
+          value: "5151"
+        - name: TC_BALCM_SRVC_THREADS
+          value: "2"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx500m -Xms200m"
+        - name: JAVA_USER_OPTS
+          value: "-XX:+PrintFlagsFinal"

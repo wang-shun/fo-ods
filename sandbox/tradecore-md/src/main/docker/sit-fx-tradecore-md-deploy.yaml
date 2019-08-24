@@ -1,0 +1,55 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sit-fx-tradecore-md
+  labels:
+    app: sit-fx-tradecore-md
+
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: sit-fx-tradecore-md
+    spec:
+      containers:
+      - name: sit-fx-tradecore-md
+        image: gcr.io/fo-ods/tradecore-md
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "600Mi"
+            cpu: "600m"
+          limits:
+            memory: "700Mi"
+            cpu: "700m"
+        env:
+        - name: MD_FB_UPDT_BFR_WINDOW_IN_MS
+          value: "2000"
+        - name: MARKET_SIMULATOR_FLAG
+          value: "false"
+        - name: RUN_NO
+          value: "1"
+        - name: TC_PROJECT_ID
+          value: "fo-ods"
+        - name: TC_ASSET_CLASS
+          value: "fxd"
+        - name: TC_MD_TOPIC_SUBS
+          value: "reuters-market-data-fx-sub"
+        - name: TC_FB_SRVC_ACCT_KEY
+          value: "src/main/resources/service-account/fo-ods-cred.json"
+        - name: TC_FB_DB_URL
+          value: "https://fo-ods.firebaseio.com"
+        - name: TC_FB_BASE_GRID
+          value: "fxsMarketDataGridRef"
+        - name: TC_FB_SAVE_FLAG
+          value: "true"
+        - name: TC_FB_AUTH_ID
+          value: "tradecore"
+        - name: TC_FB_AUTH_VALUE
+          value: "tradecore"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx500m -Xms200m"
+        - name: JAVA_USER_OPTS
+          value: "-XX:+PrintFlagsFinal"

@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: uat-xa-tradecore-store
+  labels:
+    app: uat-xa-tradecore-store
+
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: uat-xa-tradecore-store
+    spec:
+      containers:
+      - name: uat-xa-tradecore-store
+        image: gcr.io/fo-ods/tradecore-store-api
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "700Mi"
+            cpu: "500m"
+        ports:
+        - name: grpc
+          containerPort: 3002
+        env:
+        - name: GRPC_PORT
+          value: "3002"
+        - name: INSTANCE_ID
+          value: "uat-xa-tradecore"
+        - name: DATABASE
+          value: "uat-xa-tradecore"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx500m -Xms200m"
+        - name: JAVA_USER_OPTS
+          value: "-XX:+PrintFlagsFinal"

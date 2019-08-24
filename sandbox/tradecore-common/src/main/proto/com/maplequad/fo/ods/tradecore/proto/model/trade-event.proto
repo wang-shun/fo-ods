@@ -1,0 +1,47 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model;
+
+import "google/protobuf/timestamp.proto";
+import "com/maplequad/fo/ods/tradecore/proto/model/eq/equity.proto";
+import "com/maplequad/fo/ods/tradecore/proto/model/fi/ird.proto";
+import "com/maplequad/fo/ods/tradecore/proto/model/fx/fxd.proto";
+import "com/maplequad/fo/ods/tradecore/proto/model/trade-party.proto";
+
+//TradeEvent
+message TradeEvent {
+
+    //Primary Key
+    string tradeId = 1;
+    google.protobuf.Timestamp validTimeFrom = 2;
+    google.protobuf.Timestamp validTimeTo = 3;
+    google.protobuf.Timestamp transactionTimeFrom = 4;
+    google.protobuf.Timestamp transactionTimeTo = 5;
+
+    //Attributes
+    string parentTradeId = 6;
+    string eventType = 7;
+    string eventStatus = 8;
+    string eventReference = 9;
+    string eventRemarks = 10;
+    int64 noOfLegs = 11;
+    string osVersion = 12;
+    string osVersionStatus = 13;
+    string orderId = 14;
+    string exchangeExecutionId = 15;
+    string trader = 16;
+    string salesman = 17;
+    string traderCountry = 18;
+    string salesmanCountry = 19;
+    //    bool activeFlag = 20;
+    //    bool lockedFlag = 21;
+
+    //Audit Trail
+    string createdBy = 20;
+
+    //Collections
+    repeated TradeParty tradeParties = 21;
+    repeated com.maplequad.fo.ods.tradecore.proto.model.eq.Equity equityLegs = 22;
+    repeated com.maplequad.fo.ods.tradecore.proto.model.fi.Ird irdLegs = 23;
+    repeated com.maplequad.fo.ods.tradecore.proto.model.fx.Fxd fxdLegs = 24;
+
+}

@@ -1,0 +1,8 @@
+{
+  "name": "TradeCoreWeb",
+  "short_name": "TradeCoreWeb",
+  "start_url": "static/index.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "gcm_sender_id": "103953800507"
+}

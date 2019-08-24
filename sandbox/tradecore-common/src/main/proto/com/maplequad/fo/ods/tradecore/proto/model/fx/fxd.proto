@@ -1,0 +1,36 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model.fx;
+import "google/protobuf/timestamp.proto";
+
+//FX Derivative
+message Fxd {
+
+    //Primary Key
+    string tradeId = 1;
+    google.protobuf.Timestamp validTimeFrom = 2;
+    google.protobuf.Timestamp validTimeTo = 3;
+    google.protobuf.Timestamp transactionTimeFrom = 4;
+    google.protobuf.Timestamp transactionTimeTo = 5;
+    int64 legNumber = 6;
+
+    //Common Attributes
+    string legType = 7;
+    string book = 8;
+    string internalProductType = 9;
+    string internalProductRef = 10;
+    string instrumentId = 11;
+    string ric = 12;
+    string isin = 13;
+    string currency = 14;
+    string exchange = 15;
+    string buySellInd = 16;
+
+    //FX Derivative Attributes - pretty simple for spot/fwd. Swaps would be different
+    float spotRate = 17;
+    float allInRate = 18;
+    string baseCcy = 19;
+    string counterCcy = 20;
+    float volume = 21;
+    string tenor = 22;
+    string valueDate = 23;
+}

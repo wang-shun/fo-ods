@@ -1,0 +1,55 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.service.grpc;
+
+option java_multiple_files = true;
+option java_outer_classname = "TradeCoreBulkAmendService";
+option java_package = "com.maplequad.fo.ods.tradecore.proto.service.grpc";
+option objc_class_prefix = "LM";
+
+import "../../model/trade.proto";
+import "../../model/event/bulk-amend.proto";
+
+// TradeCore BA LCM API
+service TradeCoreBulkAmend {
+    // Initiate the bulk amend for all trades matching the criteria..
+    rpc InitiateBulkAmend (com.maplequad.fo.ods.tradecore.proto.model.event.BulkAmend) returns (BulkAmendResponse) {
+    }
+    // Execute the bulk amend post user review and confirmation.
+    rpc ExecuteBulkAmend (ExecuteBulkAmendRequest) returns (BulkAmendResponse) {
+    }
+    // Cancel the bulk amend post user review and confirmation.
+    rpc CancelBulkAmend (CancelBulkAmendRequest) returns (CancelBulkAmendResponse) {
+    }
+    //Test Connection
+    rpc TestConnection (TestRequest) returns (TestResponse) {
+    }
+}
+
+message ExecuteBulkAmendRequest {
+    string bulkAmendId = 1;
+}
+
+message CancelBulkAmendRequest {
+    string bulkAmendId = 1;
+}
+
+message CancelBulkAmendResponse {
+    string bulkAmendId = 1;
+    com.maplequad.fo.ods.tradecore.proto.model.event.BulkAmend bulkAmend = 2;
+}
+
+message BulkAmendResponse {
+    string bulkAmendId = 1;
+    com.maplequad.fo.ods.tradecore.proto.model.event.BulkAmend bulkAmend = 2;
+    repeated string impactedTradeIds = 3;
+    repeated com.maplequad.fo.ods.tradecore.proto.model.Trade impactedTrades = 4;
+    repeated com.maplequad.fo.ods.tradecore.proto.model.Trade resultingTrades = 5;
+}
+
+message TestRequest {
+    string request = 1;
+}
+
+message TestResponse {
+    string response = 1;
+}

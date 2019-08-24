@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tradecore-ult
+  labels:
+    app: tradecore-ult
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  containers:
+  - name: tradecore-ult
+    # Replace [GCLOUD_PROJECT] with your project ID.
+    image: eu.gcr.io/fo-ods/tradecore-ult:v1
+    
+    ports:
+        - containerPort: 8080
+          protocol: TCP
+    args: ["java", "-jar", "/app.jar"]
+    env:
+    - name: JAVA_HEAP_OPTS
+      value: "-Xmx500m -Xms500m"
+    - name: JAVA_USER_OPTS
+      value: "-XX:+PrintFlagsFinal"
+    - name: ULT_SUB_ID
+      value: "ultpullsubscription"
+    - name: DLT_PUBSUB_TOPIC
+      value: "dltpubsubtopic"
+    - name: PUBSUB_TOPIC
+      value: "ultpullpubsubtopic"
+
+      #value: "-XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+    # This setting makes nodes pull the docker image every time before
+    # starting the pod. This is useful when debugging, but should be turned
+    # off in production.
+    imagePullPolicy: Always
+  restartPolicy: Never

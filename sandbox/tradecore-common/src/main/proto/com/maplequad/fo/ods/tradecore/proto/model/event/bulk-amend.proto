@@ -1,0 +1,48 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model.event;
+
+import "google/protobuf/timestamp.proto";
+import "com/maplequad/fo/ods/tradecore/proto/model/trade.proto";
+import "com/maplequad/fo/ods/tradecore/proto/model/tradequery.proto";
+
+
+
+//BulkAmend
+message BulkAmend {
+    google.protobuf.Timestamp asOf = 2;
+    string assetClass = 3;
+    string bulkAmendType = 4;
+    string description = 5;
+    string createdBy = 6;
+    BulkAmendDetails type = 7;
+    google.protobuf.Timestamp osRequestTimestamp = 8;
+    google.protobuf.Timestamp lcmStartTimestamp = 9;
+    google.protobuf.Timestamp dsStartTimestamp = 10;
+    google.protobuf.Timestamp dbStartTimestamp = 11;
+    google.protobuf.Timestamp dbFinishTimestamp = 12;
+    google.protobuf.Timestamp dsFinishTimestamp = 13;
+    google.protobuf.Timestamp lcmFinishTimestamp = 14;
+}
+
+message BulkAmendDetails {
+    oneof type {
+        Compression compression = 1;
+        Split split = 2;
+        Dividend dividend = 3;
+    }
+}
+
+message Compression {
+    string bookId = 1;
+    string instrumentId = 2;
+}
+
+message Split {
+    string instrumentId = 1;
+    double ratio = 2;
+}
+
+message Dividend {
+    string instrumentId = 1;
+    double dividend = 2;
+}

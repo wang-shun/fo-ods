@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+	<bean id="BasictStateTransitionGraph" class="com.foods.statediagram.StateTransitionGraph"
+		scope="singleton">
+		<property name="states">
+			<set>
+				<value>NEW</value>
+				<value>DONE</value>
+				<value>VER</value>
+				<value>PENDVER</value>
+				<value>INTERM</value>
+				<value>PENDCANC</value>
+				<value>CANC</value>
+				<value>MAT</value>
+			</set>
+		</property>
+		
+		<property name="actions">
+			<set>
+				<value>CREATE</value>
+				<value>MATURE</value>
+				<value>SAVE</value>
+				<value>FTERM</value>
+				<value>PTERM</value>
+				<value>APPROVE</value>
+				<value>REJECT</value>
+				<value>CANCEL</value>
+				<value>BULK_TERM</value>
+				<value>BULK_WRITE</value>
+				<value>BULK_APPROVE</value>
+				<value>BULK_REJECT</value>
+			</set>
+		</property>
+
+		<property name="transitionList">
+			<list>
+				<bean name="NEW2DONECREATE"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="NEW"/>
+					<property name="to" value="DONE"/>
+					<property name="action" value="CREATE"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.NEW2DONESimpleTransitionHandler"/>
+					</property>
+				</bean>
+				
+				<bean name="DONE2DONEAMEND"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="DONE"/>
+					<property name="to" value="DONE"/>
+					<property name="action" value="SAVE"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="DONE2DONEPTERM"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="DONE"/>
+					<property name="to" value="DONE"/>
+					<property name="action" value="PTERM"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="DONE2DONEFTERM"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="DONE"/>
+					<property name="to" value="DONE"/>
+					<property name="action" value="FTERM"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="DONE2PENDCANC"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="DONE"/>
+					<property name="to" value="PENDCANC"/>
+					<property name="action" value="CANCEL"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="DONE2DONEREJECT"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="DONE"/>
+					<property name="to" value="DONE"/>
+					<property name="action" value="REJECT"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+				
+				<bean name="DONE2VERCREATE"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="DONE"/>
+					<property name="to" value="VER"/>
+					<property name="action" value="APPROVE"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.DONE2VERSimpleTransitionHandler"/>
+					</property>
+				</bean>
+				
+				
+				
+				<bean name="VER2PENDVERAMEND"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="VER"/>
+					<property name="to" value="PENDVER"/>
+					<property name="action" value="SAVE"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.VER2PENDVERSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+
+				<bean name="VER2PENDVERFTERM"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="VER"/>
+					<property name="to" value="PENDVER"/>
+					<property name="action" value="FTERM"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.VER2PENDVERSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="VER2PENDVERPTERM"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="VER"/>
+					<property name="to" value="PENDVER"/>
+					<property name="action" value="PTERM"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.VER2PENDVERSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="VER2PENDCANC"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="VER"/>
+					<property name="to" value="PENDCANC"/>
+					<property name="action" value="CANCEL"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+
+				<bean name="PENDVER2PENDCANC"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="PENDVER"/>
+					<property name="to" value="PENDCANC"/>
+					<property name="action" value="CANCEL"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="PENDVER2PENDVERAMEND"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="PENDVER"/>
+					<property name="to" value="PENDVER"/>
+					<property name="action" value="SAVE"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="PENDVER2PENDVERREJECT"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="PENDVER"/>
+					<property name="to" value="PENDVER"/>
+					<property name="action" value="REJECT"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+				
+				
+				<bean name="PENDVER2VERCREATE"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="PENDVER"/>
+					<property name="to" value="VER"/>
+					<property name="action" value="APPROVE"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.DONE2VERSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="PENDCANC2CANC"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="PENDCANC"/>
+					<property name="to" value="CANC"/>
+					<property name="action" value="APPROVE"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+
+				<bean name="PENDCANCREJECT"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="PENDCANC"/>
+					<property name="to" value="PENDCANC"/>
+					<property name="action" value="REJECT"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.AmendSimpleTransitionHandler"/>
+					</property>
+				</bean>
+				
+				<bean name="VER2MATMATURE"  class="com.foods.statediagram.model.Transition">
+					<property name="from" value="VER"/>
+					<property name="to" value="MAT"/>
+					<property name="action" value="MATURE"/>
+					<property name="handler">
+						<bean class="com.foods.statediagram.transition.VER2MATSimpleTransitionHandler"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

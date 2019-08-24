@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: fo-ods-tradecore
+  labels:
+    app: fo-ods-tradecore
+
+spec:
+  replicas: 3
+
+  template:
+    metadata:
+      labels:
+        app: fo-ods-tradecore-loadgen
+
+    spec:
+      containers:
+      - name: fo-ods-tradecore-loadgen-app
+        image: gcr.io/fo-ods/fo-ods-tradecore-loadgen
+        imagePullPolicy: Always
+
+        # The traderepository process listens on port 8080 for web traffic by default.
+        ports:
+        - name: grpc
+          containerPort: 8090
+        env:
+        - name: SERVICE_GRPC_PORT
+          value: "8090"
+        - name: PROJECT_ID
+          value: fo-ods
+        - name: BIGTABLE_INSTANCE_ID
+          value: repository-test

@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: loadtest-job
+  labels:
+    app: loadtest-job
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  completions: 60
+  parallelism: 60
+  template:
+    spec:
+      containers:
+      - name: loadtest
+        # Replace [GCLOUD_PROJECT] with your project ID.
+        image: gcr.io/fo-ods/traderepository:v8
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "500Mi"
+            cpu: "300m"
+        args: ["java", "-cp", "app.jar", "foods.bigtable.loadtest.LoadTester", "fo-ods", "bigtable-test", "300000", "10"]
+        env:
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx400m -Xms200m"
+        - name: JAVA_USER_OPTS
+          value: "-XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+      restartPolicy: Never

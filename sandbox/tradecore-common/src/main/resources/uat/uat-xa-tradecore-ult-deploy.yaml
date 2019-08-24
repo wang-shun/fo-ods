@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: uat-xa-tradecore-ult
+  labels:
+    app: uat-xa-tradecore-ult
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: uat-xa-tradecore-ult
+
+    spec:
+      containers:
+      - name: uat-xa-tradecore-service
+        # Replace [GCLOUD_PROJECT] with your project ID.
+        image: eu.gcr.io/fo-ods/tradecore-ult:v1
+
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+
+        # The traderepository process listens on port 8080 for web traffic by default.
+        ports:
+        - name: http
+          containerPort: 8080
+        env:
+        - name: SERVICE_HTTP_PORT
+          value: "8080"
+        - name: PROJECT_ID
+          value: "fo-ods"
+        - name: FX_PUBSUB_TOPIC
+          value: "uat-fx-ult-feed"
+        - name: FX_ULT_SUB_ID
+          value: "uat-fx-lcm-feed-ult-sub"
+        - name: FX_DLT_PUBSUB_TOPIC
+          value: "uat-fx-lcm-feed"
+        - name: IR_PUBSUB_TOPIC
+          value: "uat-ir-ult-feed"
+        - name: IR_ULT_SUB_ID
+          value: "uat-ir-lcm-feed-ult-sub"
+        - name: IR_DLT_PUBSUB_TOPIC
+          value: "uat-ir-lcm-feed"
+        - name: EQ_PUBSUB_TOPIC
+          value: "uat-eq-ult-feed"
+        - name: EQ_ULT_SUB_ID
+          value: "uat-eq-lcm-feed-ult-sub"
+        - name: EQ_DLT_PUBSUB_TOPIC
+          value: "uat-eq-lcm-feed"

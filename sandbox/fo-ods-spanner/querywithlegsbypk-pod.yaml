@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: querywithlegsbypk-pod
+  labels:
+    app: querywithlegsbypk-pod
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  containers:
+  - name: querywithlegsbypk
+    # Replace [GCLOUD_PROJECT] with your project ID.
+    image: gcr.io/fo-ods/spanner:v3
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "200m"
+      limits:
+        memory: "500Mi"
+        cpu: "400m"
+    args: ["java", "-cp", "app.jar", "spanner.QueryTester", "spanner-test", "tradeslegs", "spanner.QueryWithLegsByPkTester", "250000", "true"]
+    env:
+    - name: JAVA_HEAP_OPTS
+      value: "-Xmx500m -Xms500m"
+    - name: JAVA_USER_OPTS
+      value: "-XX:+PrintFlagsFinal"
+
+      #value: "-XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+    # This setting makes nodes pull the docker image every time before
+    # starting the pod. This is useful when debugging, but should be turned
+    # off in production.
+    imagePullPolicy: Always
+  restartPolicy: Never

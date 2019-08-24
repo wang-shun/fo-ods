@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Learn how to use the Firebase platform on the Web">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeCoreWeb-v2.0</title>
+
+  <!-- Disable tap highlight on IE -->
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <!-- Web Application Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="TradeCore Web">
+  <meta name="theme-color" content="#303F9F">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TradeCore Web">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#303F9F">
+
+  <!-- Tile icon for Win8 -->
+  <meta name="msapplication-TileColor" content="#3372DF">
+  <meta name="msapplication-navbutton-color" content="#303F9F">
+
+  <!-- Material Design Lite -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css">
+  <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+  <!-- App Styling -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+  <link rel="stylesheet" href="styles/tradecore.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.3/es6-shim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js"></script>
+
+  <script src="./scripts/ag-grid-enterprise.min.js"></script>
+  <!-- Loading Bootstrap -->
+  <!--link href="flat-ui/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"-->
+
+  <!-- Loading Flat UI -->
+  <link href="flat-ui/css/flat-ui.min.css" rel="stylesheet">
+  <style>
+    .redFont {
+      color: red;
+    }
+
+    .preLogIn {
+      background-color: #333333;
+      color: white;
+      margin-top: 300px;
+      text-align: center;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .ag-fresh .ag-value-change-value-highlight {
+      background-color: #afbcff;
+    }
+
+    .align-right {
+      text-align: right
+    }
+
+    .pct-change-green {
+      background-color: lightgreen;
+    }
+
+    .pct-change-amber {
+      background-color: lightgoldenrodyellow;
+    }
+
+    .pct-change-red {
+      background-color: red;
+    }
+
+    .fx-null {
+      background-color: rgb(98, 98, 98);
+    }
+
+    .fx-positive {
+      background-color: green;
+    }
+
+    .fx-negative {
+      background-color: red;
+    }
+
+    .blackish {
+      background-color: #333333;
+      padding-bottom: 10px;
+    }
+
+    .graphBox {
+      color: white;
+      border: 1px solid grey;
+      margin-top: 22px;
+    }
+
+    span#deltaPanelPrice {
+      font-size: 31px !important;
+    }
+
+    .graphBoxContainer {
+      padding-left: 10px;
+    }
+
+    text {
+      fill: grey;
+    }
+
+    .ag-value-change-delta-down {
+      color: red !important;
+    }
+
+    .ag-value-change-delta-up {
+      color: #2d812f !important;
+    }
+
+    .ag-value-change-value-highlight {
+      background-color: rgb(98, 98, 98) !important;
+      color: black !important;
+    }
+  </style>
+  <script type="text/javascript" src="./scripts/horizontal-bar-component.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/exchange-service.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/stock-historical-chart.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/stock-detail-panel.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/price-changes-grid.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/eqt-trade-blotter-grid.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/irs-trade-blotter-grid.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/fx-market-data.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/eq-market-data.js" charset="utf-8"></script>
+  <script type="text/javascript" src="./scripts/dashboard.js" charset="utf-8"></script>
+
+</head>
+
+<body>
+  <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header blackish">
+
+    <!-- Header section containing logo -->
+    <!--header class="mdl-layout__header mdl-color-text--white mdl-color--grey-700"-->
+    <header class="mdl-layout__header mdl-color-text--white palette-midnight-blue">
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
+        <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
+          <h4>TradeCore - Front Office Operational Data Store</h4>
+          <div style="margin-left:10px; margin-top:10px;">v2.0</div>
+        </div>
+    
+        <div id="user-container">
+          <div hidden id="user-pic"></div>
+          <div hidden id="user-name"></div>
+          <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+          Sign-out
+        </button>
+          <button hidden id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+          <i class="material-icons">account_circle</i>Sign-in
+        </button>
+        </div>
+      </div>
+    </header>
+
+    <!--main class="mdl-layout__content mdl-color--grey-100">
+    <div class="HomeSectionParent">
+      <section class="HomeSection HomeDemo hidden-xs"-->
+    <div class="container-fluid preLogIn" id="preLogInTradeCoreContainer">
+      Please login using your Google account using "SIGN-IN" button on the top right corner only if you are authorised to use TradeCore.
+    </div>
+    <div class="container-fluid blackish" id="tradeCoreContainer" style="display : none">
+      <!--div class="row HomeDemo-main"-->
+      <div class="col-md-12 blackish">
+      <div style="width: 100%; clear: both; padding-top: 5px">
+        <div style="color: white;">FX Market Data</div>
+        <div id="fxMarketDataGrid" style="height: 600px;" class="ag-dark"></div>
+      </div>
+      <div style="width: 100%; clear: both; padding-top: 5px">
+        <div style="color: white;">EQ Market Data</div>
+        <div id="eqMarketDataGrid" style="height: 350px;" class="ag-dark"></div>
+      </div>
+        <div>
+          <div style="float: left; margin-bottom:10px; margin-right: 35px">
+            <div style="color: white; height:40px; margin-top: 10px;">
+              <select id="cboExchangeCode" name="cboExchangeCode" class="form-control select select-inverse" data-toggle="select" onchange="javascript:changeExchange();">
+                <option value="LSE" selected>London Stock Exchange</option>
+                <option value="NASDAQ">Nasdaq Stock Market</option>
+                <option value="JSE">Japan Exchange Group</option>
+                <option value="DE">Deutsche Börse</option>
+              </select>
+              <div class="btn-group" style="margin-left:7px">
+                <button data-toggle="dropdown" class="btn btn-inverse dropdown-toggle" type="button">Trade Booking<span class="caret"></span></button>
+                <ul role="menu" class="dropdown-menu">
+                  <li><a href="javascript:tradeBooking('EQT')">Cash Equities</a></li>
+                  <li class="divider"></li>
+                  <li><a href="javascript:tradeBooking('IRS');">Interest Rate Swap</a></li>
+                  <li class="divider"></li>
+                  <li><a href="javascript:tradeBooking('FXF');">Fx Forward</a></li>
+                  <li class="divider"></li>
+                  <li><a href="javascript:tradeBooking('STR');">Structured Trade</a></li>
+                  <li class="divider"></li>
+                </ul>
+              </div>
+              <div class="btn-group" style="margin-left:7px">
+                <button data-toggle="dropdown" class="btn btn-inverse dropdown-toggle" type="button">Execute Bulk Amends<span class="caret"></span></button>
+                <ul role="menu" class="dropdown-menu">
+                  <li><a href="javascript:openBulkAmendGrid('ird')"><strong>Interest Rate Swap</strong></a></li>
+                  <li><a href="javascript:initiateBulkAmend('IRSTRCP')">Trade Compression</a></li>
+                  <li class="divider"></li>
+                  <li><a href="javascript:openBulkAmendGrid('eqt')"><strong>Cash Equity</strong></a></li>
+                  <li><a href="javascript:initiateBulkAmend('EQTBONS');">Bonus</a></li>
+                  <li><a href="javascript:initiateBulkAmend('EQTSPLT');">Split</a></li>
+                  <li><a href="javascript:initiateBulkAmend('EQTDVND');">Dividend</a></li>
+                  <li class="divider"></li>
+                  <li><a href="javascript:openBulkAmendGrid('fxd')"><strong>FX Forward</strong></a></li>
+                  <li><a href="javascript:initiateBulkAmend('FXFBLCL');">Bulk Terminate</a></li>
+                  <li class="divider"></li>
+                </ul>
+              </div>
+              <!-- /btn-group -->
+             <!-- &nbsp;&nbsp;
+             <select id="cboTradeBooking" name="cboTradeBooking" class="form-control select select-inverse" data-toggle="select" onchange="javascript:tradeBooking();">
+                <option value="0" selected>Trade Booking</option>
+                <option value="EQT" >Cash Equities</option>
+                <option value="IRS">Interest Rate Swap</option>
+                <option value="FXF">Fx Forward</option>
+                <option value="STR">Structured Trade</option>
+              </select-->
+              <a tabindex="0" style="float: right" data-toggle="popover" data-trigger="focus" data-html="true" title="Subscription Based Updates"
+                data-content="Utilises a mechanism whereby a service is passed a callback per row, which is fired when that row's data changes. The Grid updates the row data with the Transaction API.<br/><br/>Only changed rows are re-rendered for improved performance."><i
+                                        class="fa fa-question-circle-o" aria-hidden="true"></i></a>
+            </div>
+            <div id="priceChangesGrid" style="height: 425px; margin-top:10px; width: 700px;" class="ag-dark"></div>
+          </div>
+          <div style="float: left" class="graphBox">
+            <div class="graphBoxContainer">
+              <div>
+                <span id="deltaPanelScript" style="font-size: 2.0em; font-weight: bold;margin-right: 10px"></span>
+                <span id="deltaPanelPrice" style="font-size: 2.6em; font-weight: bold;margin-right: 10px"></span>
+                <div style="display: inline-block">
+                  <span style="font-weight: std; font-size: 1.1em; vertical-align: bottom">
+                                <span id="deltaPanelSwing"></span>
+                  <span id="deltaPctPanelSwing"></span>
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <span id="timestamp"></span>
+                  <div style="font-size: 11px; color: #6F6F6F">
+                    <span id="exchangeName"></span>
+                    <div>Currency In <span id="currencyCode">GBP</span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size: 13px">
+                <table style="display: inline-block;vertical-align: top;border-collapse: collapse">
+                  <tbody>
+                    <tr>
+                      <td style="color: #666">Range</td>
+                      <td id="range" style="text-align: right">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="color: #666">52 week</td>
+                      <td id="fiftyTwoWeek" style="text-align: right">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="color: #666">Open</td>
+                      <td id="open" style="text-align: right">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="color: #666">Vol / Avg.</td>
+                      <td id="vol" style="text-align: right">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table style="display: inline-block;vertical-align: top;border-collapse: collapse">
+                  <tbody>
+                    <tr>
+                      <td style="color: #666">Div/yield</td>
+                      <td id="dividendYield" style="text-align: right">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="color: #666">EPS</td>
+                      <td id="eps" style="text-align: right"></td>
+                    </tr>
+                    <tr>
+                      <td style="color: #666">Shares</td>
+                      <td id="shares" style="text-align: right">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="color: #666">Market Cap</td>
+                      <td id="marketCap" style="text-align: right">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="historyGraph" style="margin-top: 5px"></div>
+            </div>
+          </div>
+        </div>
+        <div style="width: 100%; clear: both; padding-top: 5px">
+          <div style="color: white;">My Equities Trades</div>
+          <div id="equitiesTradeBlotterGrid" style="height: 445px;" class="ag-dark"></div>
+        </div>
+        <div style="width: 100%; clear: both; padding-top: 5px">
+          <div style="color: white;">My IRS Trades</div>
+          <div id="irsTradeBlotterGrid" style="height: 445px;" class="ag-dark"></div>
+        </div>
+      </div>
+      <!--/div-->
+    </div>
+    <!--/section>
+    </div-->
+    <div id="must-signin-snackbar" class="mdl-js-snackbar mdl-snackbar">
+      <div class="mdl-snackbar__text"></div>
+      <button class="mdl-snackbar__action" type="button"></button>
+    </div>
+    <!--/main-->
+
+    <!-- Import and configure the Firebase SDK -->
+    <!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
+    <!-- If you do not want to serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
+    <script src="/__/firebase/4.3.1/firebase.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="scripts/tradecore-web.js"></script>
+    <script src="flat-ui/js/flat-ui.1.js"></script>
+    <script src="flat-ui/js/application.1.js"></script>
+</body>
+
+</html>

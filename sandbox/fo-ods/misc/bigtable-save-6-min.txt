@@ -1,0 +1,327 @@
+09:14:51.612 [grpc-default-worker-ELG-2-4] INFO  f.b.s.grpc.TradeRepositoryService - SaveTrade: {"tradeId":{"id":"8251617783351313826"},"tradeVersion":54,"productType":"eq","instrumentId":"6530014965821109283","instrumentRic":"BT.L","instrumentIsin":"ISIN444444444","buySell":"S","quantity":20.747436839215094,"price":38.056306494087536,"consideration":237.5149667570704,"ccy":"GBP","settlementCcy":"GBP","executionVenue":"XMAD","book":"BOOK1"}
+09:14:51.615 [grpc-default-worker-ELG-2-4] INFO  f.b.s.grpc.TradeRepositoryService - Parsed trade: EquityTrade{tradeId=TradeId{8251617783351313826}, tradeVersion=54, productType='eq', instrumentId='6530014965821109283', instrumentRic='BT.L', instrumentIsin='ISIN444444444', buySell='S', quantity=20.747436839215094, price=38.056306494087536, consideration=237.5149667570704, ccy='GBP', settlementCcy='GBP', executionVenue='XMAD', book='BOOK1'}
+09:14:51.616 [grpc-default-worker-ELG-2-4] INFO  f.bigtable.repository.RealRepository - Saved with rowkey=8251617783351313826_999946
+2017-08-01 09:17:56
+Full thread dump Java HotSpot(TM) 64-Bit Server VM (25.141-b15 mixed mode):
+
+"grpc-default-executor-2" #31 daemon prio=5 os_prio=31 tid=0x00007f82d9a70000 nid=0x5907 waiting on condition [0x0000700011688000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+	- parking to wait for  <0x0000000740440730> (a java.util.concurrent.SynchronousQueue$TransferStack)
+	at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)
+	at java.util.concurrent.SynchronousQueue$TransferStack.awaitFulfill(SynchronousQueue.java:460)
+	at java.util.concurrent.SynchronousQueue$TransferStack.transfer(SynchronousQueue.java:362)
+	at java.util.concurrent.SynchronousQueue.poll(SynchronousQueue.java:941)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1073)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1134)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-worker-ELG-2-8" #30 daemon prio=5 os_prio=31 tid=0x00007f82da28d000 nid=0x6303 runnable [0x0000700011b97000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)
+	at sun.nio.ch.KQueueArrayWrapper.poll(KQueueArrayWrapper.java:198)
+	at sun.nio.ch.KQueueSelectorImpl.doSelect(KQueueSelectorImpl.java:117)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+	- locked <0x00000007403ed5c8> (a io.netty.channel.nio.SelectedSelectionKeySet)
+	- locked <0x00000007403ef648> (a java.util.Collections$UnmodifiableSet)
+	- locked <0x00000007403ed528> (a sun.nio.ch.KQueueSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+	at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:746)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:391)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-worker-ELG-2-7" #29 daemon prio=5 os_prio=31 tid=0x00007f82d9a8c000 nid=0x6103 runnable [0x0000700011a94000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)
+	at sun.nio.ch.KQueueArrayWrapper.poll(KQueueArrayWrapper.java:198)
+	at sun.nio.ch.KQueueSelectorImpl.doSelect(KQueueSelectorImpl.java:117)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+	- locked <0x00000007403f9c38> (a io.netty.channel.nio.SelectedSelectionKeySet)
+	- locked <0x00000007403fbcb8> (a java.util.Collections$UnmodifiableSet)
+	- locked <0x00000007403f9b98> (a sun.nio.ch.KQueueSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+	at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:746)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:391)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-worker-ELG-2-6" #28 daemon prio=5 os_prio=31 tid=0x00007f82da99f000 nid=0x5f03 runnable [0x0000700011991000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)
+	at sun.nio.ch.KQueueArrayWrapper.poll(KQueueArrayWrapper.java:198)
+	at sun.nio.ch.KQueueSelectorImpl.doSelect(KQueueSelectorImpl.java:117)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+	- locked <0x00000007403fe428> (a io.netty.channel.nio.SelectedSelectionKeySet)
+	- locked <0x000000074040f3b0> (a java.util.Collections$UnmodifiableSet)
+	- locked <0x00000007403fe388> (a sun.nio.ch.KQueueSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+	at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:746)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:391)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-worker-ELG-2-5" #27 daemon prio=5 os_prio=31 tid=0x00007f82da8d3000 nid=0x5d03 runnable [0x000070001188e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)
+	at sun.nio.ch.KQueueArrayWrapper.poll(KQueueArrayWrapper.java:198)
+	at sun.nio.ch.KQueueSelectorImpl.doSelect(KQueueSelectorImpl.java:117)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+	- locked <0x0000000740411b20> (a io.netty.channel.nio.SelectedSelectionKeySet)
+	- locked <0x0000000740413ba0> (a java.util.Collections$UnmodifiableSet)
+	- locked <0x0000000740411a80> (a sun.nio.ch.KQueueSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+	at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:746)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:391)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-timer-0" #26 daemon prio=5 os_prio=31 tid=0x00007f82da9f3800 nid=0x5b03 waiting on condition [0x000070001178b000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+	- parking to wait for  <0x000000074042e128> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2078)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1093)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1074)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1134)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-worker-ELG-2-4" #24 daemon prio=5 os_prio=31 tid=0x00007f82d9444000 nid=0x500b waiting on condition [0x0000700011178000]
+   java.lang.Thread.State: WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+	- parking to wait for  <0x00000007967c6b70> (a com.google.cloud.bigtable.grpc.async.AbstractRetryingOperation$GrpcFuture)
+	at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)
+	at com.google.common.util.concurrent.AbstractFuture.get(AbstractFuture.java:445)
+	at com.google.cloud.bigtable.grpc.async.AbstractRetryingOperation.getBlockingResult(AbstractRetryingOperation.java:273)
+	at com.google.cloud.bigtable.grpc.BigtableDataGrpcClient.mutateRow(BigtableDataGrpcClient.java:235)
+	at com.google.cloud.bigtable.hbase.BigtableTable.put(BigtableTable.java:331)
+	at foods.bigtable.repository.RealRepository.put(RealRepository.java:163)
+	at foods.bigtable.service.grpc.TradeRepositoryService.doSaveTrade(TradeRepositoryService.java:101)
+	at foods.bigtable.service.grpc.TradeRepositoryService.saveTrade(TradeRepositoryService.java:45)
+	at foods.traderepository.proto.TradeRepositoryGrpc$MethodHandlers.invoke(TradeRepositoryGrpc.java:305)
+	at io.grpc.stub.ServerCalls$1$1.onHalfClose(ServerCalls.java:148)
+	at io.grpc.internal.ServerCallImpl$ServerStreamListenerImpl.halfClosed(ServerCallImpl.java:267)
+	at io.grpc.internal.ServerImpl$JumpToApplicationThreadServerStreamListener$2.runInContext(ServerImpl.java:573)
+	at io.grpc.internal.ContextRunnable.run(ContextRunnable.java:52)
+	at io.grpc.internal.SerializeReentrantCallsDirectExecutor.execute(SerializeReentrantCallsDirectExecutor.java:64)
+	at io.grpc.internal.ServerImpl$JumpToApplicationThreadServerStreamListener.halfClosed(ServerImpl.java:569)
+	at io.grpc.internal.AbstractServerStream$TransportState.endOfStream(AbstractServerStream.java:218)
+	at io.grpc.netty.NettyServerStream$TransportState.endOfStream(NettyServerStream.java:154)
+	at io.grpc.internal.MessageDeframer.deliver(MessageDeframer.java:275)
+	at io.grpc.internal.MessageDeframer.deframe(MessageDeframer.java:183)
+	at io.grpc.internal.AbstractStream2$TransportState.deframe(AbstractStream2.java:200)
+	at io.grpc.internal.AbstractServerStream$TransportState.inboundDataReceived(AbstractServerStream.java:236)
+	at io.grpc.netty.NettyServerStream$TransportState.inboundDataReceived(NettyServerStream.java:181)
+	at io.grpc.netty.NettyServerHandler.onDataRead(NettyServerHandler.java:399)
+	at io.grpc.netty.NettyServerHandler.access$400(NettyServerHandler.java:105)
+	at io.grpc.netty.NettyServerHandler$FrameListener.onDataRead(NettyServerHandler.java:650)
+	at io.netty.handler.codec.http2.DefaultHttp2ConnectionDecoder$FrameReadListener.onDataRead(DefaultHttp2ConnectionDecoder.java:240)
+	at io.netty.handler.codec.http2.Http2InboundFrameLogger$1.onDataRead(Http2InboundFrameLogger.java:48)
+	at io.netty.handler.codec.http2.DefaultHttp2FrameReader.readDataFrame(DefaultHttp2FrameReader.java:425)
+	at io.netty.handler.codec.http2.DefaultHttp2FrameReader.processPayloadState(DefaultHttp2FrameReader.java:250)
+	at io.netty.handler.codec.http2.DefaultHttp2FrameReader.readFrame(DefaultHttp2FrameReader.java:160)
+	at io.netty.handler.codec.http2.Http2InboundFrameLogger.readFrame(Http2InboundFrameLogger.java:41)
+	at io.netty.handler.codec.http2.DefaultHttp2ConnectionDecoder.decodeFrame(DefaultHttp2ConnectionDecoder.java:118)
+	at io.netty.handler.codec.http2.Http2ConnectionHandler$FrameDecoder.decode(Http2ConnectionHandler.java:341)
+	at io.netty.handler.codec.http2.Http2ConnectionHandler.decode(Http2ConnectionHandler.java:401)
+	at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:411)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:248)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:363)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:349)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:341)
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1334)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:363)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:349)
+	at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:926)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:129)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:642)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:565)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:479)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:441)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-worker-ELG-2-3" #23 daemon prio=5 os_prio=31 tid=0x00007f82da9fa000 nid=0x5703 runnable [0x0000700011585000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)
+	at sun.nio.ch.KQueueArrayWrapper.poll(KQueueArrayWrapper.java:198)
+	at sun.nio.ch.KQueueSelectorImpl.doSelect(KQueueSelectorImpl.java:117)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+	- locked <0x0000000740422ab0> (a io.netty.channel.nio.SelectedSelectionKeySet)
+	- locked <0x0000000740424b30> (a java.util.Collections$UnmodifiableSet)
+	- locked <0x0000000740422a10> (a sun.nio.ch.KQueueSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+	at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:746)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:391)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-worker-ELG-2-2" #22 daemon prio=5 os_prio=31 tid=0x00007f82da35b000 nid=0x5503 runnable [0x0000700011482000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)
+	at sun.nio.ch.KQueueArrayWrapper.poll(KQueueArrayWrapper.java:198)
+	at sun.nio.ch.KQueueSelectorImpl.doSelect(KQueueSelectorImpl.java:117)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+	- locked <0x00000007404272a0> (a io.netty.channel.nio.SelectedSelectionKeySet)
+	- locked <0x0000000740429320> (a java.util.Collections$UnmodifiableSet)
+	- locked <0x0000000740427200> (a sun.nio.ch.KQueueSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+	at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:746)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:391)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-executor-0" #21 daemon prio=5 os_prio=31 tid=0x00007f82d90d3800 nid=0x4f07 waiting on condition [0x000070001137f000]
+   java.lang.Thread.State: WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+	- parking to wait for  <0x0000000795c32df0> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2039)
+	at java.util.concurrent.LinkedBlockingQueue.put(LinkedBlockingQueue.java:350)
+	at com.google.cloud.bigtable.grpc.scanner.ResponseQueueReader.onNext(ResponseQueueReader.java:135)
+	at com.google.cloud.bigtable.grpc.scanner.ResponseQueueReader.onNext(ResponseQueueReader.java:39)
+	at com.google.cloud.bigtable.grpc.scanner.RowMerger.onNext(RowMerger.java:412)
+	at com.google.cloud.bigtable.grpc.scanner.RetryingReadRowsOperation.onMessage(RetryingReadRowsOperation.java:115)
+	at com.google.cloud.bigtable.grpc.scanner.RetryingReadRowsOperation.onMessage(RetryingReadRowsOperation.java:44)
+	at com.google.cloud.bigtable.grpc.io.ChannelPool$InstrumentedChannel$2.onMessage(ChannelPool.java:193)
+	at io.grpc.ForwardingClientCallListener.onMessage(ForwardingClientCallListener.java:51)
+	at io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl$1MessageRead.runInContext(ClientCallImpl.java:489)
+	at io.grpc.internal.ContextRunnable.run(ContextRunnable.java:52)
+	at io.grpc.internal.SerializingExecutor.run(SerializingExecutor.java:117)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+
+"threadDeathWatcher-1-2" #20 daemon prio=1 os_prio=31 tid=0x00007f82da8a9800 nid=0x1407 waiting on condition [0x000070001127c000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep(Native Method)
+	at io.netty.util.ThreadDeathWatcher$Watcher.run(ThreadDeathWatcher.java:152)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-worker-ELG-2-1" #19 daemon prio=5 os_prio=31 tid=0x00007f82da9bf000 nid=0x1307 runnable [0x0000700011076000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)
+	at sun.nio.ch.KQueueArrayWrapper.poll(KQueueArrayWrapper.java:198)
+	at sun.nio.ch.KQueueSelectorImpl.doSelect(KQueueSelectorImpl.java:117)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+	- locked <0x000000074042ba90> (a io.netty.channel.nio.SelectedSelectionKeySet)
+	- locked <0x000000074042db10> (a java.util.Collections$UnmodifiableSet)
+	- locked <0x000000074042b9f0> (a sun.nio.ch.KQueueSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+	at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:746)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:391)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"grpc-default-boss-ELG-4-1" #18 daemon prio=5 os_prio=31 tid=0x00007f82d9a8d800 nid=0x520f runnable [0x000070000ffc0000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.KQueueArrayWrapper.kevent0(Native Method)
+	at sun.nio.ch.KQueueArrayWrapper.poll(KQueueArrayWrapper.java:198)
+	at sun.nio.ch.KQueueSelectorImpl.doSelect(KQueueSelectorImpl.java:117)
+	at sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)
+	- locked <0x00000007403121a0> (a io.netty.channel.nio.SelectedSelectionKeySet)
+	- locked <0x000000074039a4e8> (a java.util.Collections$UnmodifiableSet)
+	- locked <0x00000007403120f0> (a sun.nio.ch.KQueueSelectorImpl)
+	at sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)
+	at io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:746)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:391)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:858)
+	at io.netty.util.concurrent.DefaultThreadFactory$DefaultRunnableDecorator.run(DefaultThreadFactory.java:144)
+	at java.lang.Thread.run(Thread.java:748)
+
+"Service Thread" #9 daemon prio=9 os_prio=31 tid=0x00007f82da8d2800 nid=0x4a03 runnable [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"C1 CompilerThread2" #8 daemon prio=9 os_prio=31 tid=0x00007f82d90d1000 nid=0x4803 waiting on condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"C2 CompilerThread1" #7 daemon prio=9 os_prio=31 tid=0x00007f82d90c8000 nid=0x4603 waiting on condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"C2 CompilerThread0" #6 daemon prio=9 os_prio=31 tid=0x00007f82da128800 nid=0x4403 waiting on condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Monitor Ctrl-Break" #5 daemon prio=5 os_prio=31 tid=0x00007f82da126800 nid=0x4203 runnable [0x0000700010a64000]
+   java.lang.Thread.State: RUNNABLE
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+	at java.net.SocketInputStream.read(SocketInputStream.java:171)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
+	at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
+	at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
+	- locked <0x00000007403a6c70> (a java.io.InputStreamReader)
+	at java.io.InputStreamReader.read(InputStreamReader.java:184)
+	at java.io.BufferedReader.fill(BufferedReader.java:161)
+	at java.io.BufferedReader.readLine(BufferedReader.java:324)
+	- locked <0x00000007403a6c70> (a java.io.InputStreamReader)
+	at java.io.BufferedReader.readLine(BufferedReader.java:389)
+	at com.intellij.rt.execution.application.AppMainV2$1.run(AppMainV2.java:64)
+
+"Signal Dispatcher" #4 daemon prio=9 os_prio=31 tid=0x00007f82da815800 nid=0x4003 waiting on condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Finalizer" #3 daemon prio=8 os_prio=31 tid=0x00007f82d900c800 nid=0x3103 in Object.wait() [0x000070001085e000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(Native Method)
+	- waiting on <0x0000000740353598> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:143)
+	- locked <0x0000000740353598> (a java.lang.ref.ReferenceQueue$Lock)
+	at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:164)
+	at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:209)
+
+"Reference Handler" #2 daemon prio=10 os_prio=31 tid=0x00007f82d9820800 nid=0x2f03 in Object.wait() [0x000070001075b000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(Native Method)
+	- waiting on <0x0000000740353540> (a java.lang.ref.Reference$Lock)
+	at java.lang.Object.wait(Object.java:502)
+	at java.lang.ref.Reference.tryHandlePending(Reference.java:191)
+	- locked <0x0000000740353540> (a java.lang.ref.Reference$Lock)
+	at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:153)
+
+"main" #1 prio=5 os_prio=31 tid=0x00007f82da801800 nid=0x1c03 in Object.wait() [0x0000700010149000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait(Native Method)
+	- waiting on <0x00000007403a7bd8> (a java.lang.Object)
+	at java.lang.Object.wait(Object.java:502)
+	at TradeRepositoryMain.main(TradeRepositoryMain.java:54)
+	- locked <0x00000007403a7bd8> (a java.lang.Object)
+
+"VM Thread" os_prio=31 tid=0x00007f82d9820000 nid=0x2d03 runnable
+
+"GC task thread#0 (ParallelGC)" os_prio=31 tid=0x00007f82da006800 nid=0x2503 runnable
+
+"GC task thread#1 (ParallelGC)" os_prio=31 tid=0x00007f82d9000800 nid=0x2703 runnable
+
+"GC task thread#2 (ParallelGC)" os_prio=31 tid=0x00007f82da007000 nid=0x2903 runnable
+
+"GC task thread#3 (ParallelGC)" os_prio=31 tid=0x00007f82d9801000 nid=0x2b03 runnable
+
+"VM Periodic Task Thread" os_prio=31 tid=0x00007f82d90c1000 nid=0x4c03 waiting on condition
+
+JNI global references: 294
+
+Heap
+ PSYoungGen      total 37888K, used 23516K [0x0000000795580000, 0x0000000798880000, 0x00000007c0000000)
+  eden space 32768K, 58% used [0x0000000795580000,0x000000079683e2d0,0x0000000797580000)
+  from space 5120K, 84% used [0x0000000797600000,0x0000000797a38f90,0x0000000797b00000)
+  to   space 9728K, 0% used [0x0000000797f00000,0x0000000797f00000,0x0000000798880000)
+ ParOldGen       total 56832K, used 8017K [0x0000000740000000, 0x0000000743780000, 0x0000000795580000)
+  object space 56832K, 14% used [0x0000000740000000,0x00000007407d47a0,0x0000000743780000)
+ Metaspace       used 26741K, capacity 26960K, committed 27136K, reserved 1073152K
+  class space    used 3219K, capacity 3320K, committed 3328K, reserved 1048576K
+
+09:20:51.833 [grpc-default-worker-ELG-2-4] INFO  f.b.s.grpc.TradeRepositoryService - Saved the trade

@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tradecore-servicelayer
+  labels:
+    app: tradecore-servicelayer
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  containers:
+  - name: tradecore-servicelayer
+    # Replace [GCLOUD_PROJECT] with your project ID.
+    image: eu.gcr.io/fo-ods/tradecore-servicelayer:v1
+    resources:
+      requests:
+        memory: "500Mi"
+        cpu: "200m"
+      limits:
+        memory: "500Mi"
+        cpu: "400m"
+    ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 443
+        - name: grpc
+          containerPort: 3000
+    args: ["java", "-jar", "/app.jar"]
+    env:
+    - name: JAVA_HEAP_OPTS
+      value: "-Xmx500m -Xms500m"
+    - name: JAVA_USER_OPTS
+      value: "-XX:+PrintFlagsFinal"
+    - name: ULT_SUB_ID
+      value: "ultpullsubscription"
+    - name: DLT_PUBSUB_TOPIC
+      value: "dltpubsubtopic"
+    - name: PUBSUB_TOPIC
+      value: "ultpullpubsubtopic"
+    - name: GRPC_PORT
+      value: "3000"
+    - name: CRUD_HOST
+      value: "35.189.219.191"
+    - name: CRUD_PORT
+      value: "5555"
+    - name: SUBSCRIBER_THREADS
+      value: "2"
+    - name: PUBSUB_VERIFICATION_TOKEN
+      value: "AAAAAAA"
+
+
+      #value: "-XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+    # This setting makes nodes pull the docker image every time before
+    # starting the pod. This is useful when debugging, but should be turned
+    # off in production.
+    imagePullPolicy: Always
+  restartPolicy: Never

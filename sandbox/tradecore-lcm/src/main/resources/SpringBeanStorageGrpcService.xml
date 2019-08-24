@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+
+
+
+
+	<bean id="propertyPlaceholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="searchSystemEnvironment" value="true" />
+	</bean>
+
+
+	<bean id="TradeStoreGRPCHelper" class="com.maplequad.fo.ods.tradecore.lcm.helper.TradeStoreGRPCHelper">
+		<constructor-arg type="java.lang.String" value="${DLT_PUBSUB_TOPIC}" />
+		
+		<property name="storeservice" ref="TradeCoreStoreService"></property>
+		<property name="transitionFactory" ref="StateTransitionGraphFactory"></property>
+	</bean>
+
+	<bean id="TradeCoreStoreService"
+		class="com.maplequad.fo.ods.tradecore.store.service.TradeCoreStoreService">
+		<constructor-arg type="java.lang.String" value="${CRUD_HOST}" />
+		<constructor-arg type="int" value="${CRUD_PORT}" />
+	</bean>
+
+
+	<bean id="TradeCoreLifeCycleService"
+		class="com.maplequad.fo.ods.tradecore.lcm.grpc.TradeCoreLifeCycleService">
+		<property name="grpcHelper" ref="TradeStoreGRPCHelper"></property>
+	</bean>
+
+	<bean id="TradeCoreLifeCycleServiceGrpcServer"
+		class="com.maplequad.fo.ods.tradecore.lcm.grpc.TradeCoreLifeCycleServiceGrpcServer">
+		<constructor-arg type="int" value="${GRPC_PORT}" />
+	</bean>
+	
+	<import resource="SpringBeanStateDiagram.xml" />
+</beans>

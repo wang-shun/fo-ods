@@ -1,0 +1,59 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: sit-eq-tradecore-dist-bridge
+  labels:
+    app: sit-eq-tradecore-dist-bridge
+
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sit-eq-tradecore-dist-bridge
+    spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: dist-pubsub-auth-key
+      containers:
+      - name: sit-eq-tradecore-dist-bridge
+        image: gcr.io/fo-ods/tradecore-bridge
+        volumeMounts:
+          - name: google-cloud-key
+            mountPath: /var/secrets/google
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        env:
+        - name: APP_ID
+          value: "sit-eq-tradecore-dist-bridge"
+        - name: SRC_PROJECT_ID
+          value: "fo-ods"
+        - name: SRC_TOPIC_NAME
+          value: "sit-eq-lcm-feed"
+        - name: SRC_TOPIC_SUBS_NAME
+          value: "sit-eq-lcm-feed-dist-sub"
+        - name: DEST_PROJECT_ID
+          value: "gcp-f2brb"
+        - name: DEST_TOPIC_NAME
+          value: "l1.messages"
+        - name: ACK_DEADLINE_IN_SECONDS
+          value: "600"
+        - name: BLOCKING_QUEUE_SIZE
+          value: "20000"
+        - name: NO_OF_EXEC_THREADS
+          value: "1"
+        - name: TXN_LOGGING_FLAG
+          value: "true"
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: "/var/secrets/google/dist-key.json"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx500m -Xms200m"
+        - name: JAVA_USER_OPTS
+          value: "-XX:+PrintFlagsFinal"

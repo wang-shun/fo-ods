@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "maplequad-tradecore",
+  "private_key_id": "7f4e9207e865b7bae2f8e8aca4ef192d7394e126",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCbDdE3E7jzWu+u\nSLd6VPIr+wInG+gNK60VGfhQipKYpp1nyJhqA0UmBsFrNhE2KCTZaH1/PimRIn1m\n+9BizXLCP/p1lWGsmxjeBex6dDrr/v0ne3dj3TDqI5sdtyrsJrhrHOCI2CFKh+5l\nAktOPrij38T8D9l2ugr2IWmvPsTpYUwfBnJH3FG6I7oubSq7whMqfA9xBWZ/DUVb\n21lU3FAwnpuV63r2DrzJOpgoh7vBNV9/3GB6QfNExE5iGy7hdna3UyY/NJz1UDQb\nNv+Tw8LRJu7O0EDFWYvOwGp1mLZuoLT/AOL+UOjGpJoanmDv9742kpIHFDjmVKU2\n/rrlUMQhAgMBAAECgf8AleIawhHoLqt0wUkBJLde+61CIza0kcJza4wVjpKHq7L9\nhqrIZlzlA5j7o/zkHdxKBvBQPeNQsYPYxhqleBAQeIK1VVsRmJVl2tMSTfemuUc7\ncAAuE44kQyBKSTwb/YDn97Pyae+UHLwWg2u0Tt2n4uOfy8Tbx4K6jVSuKg6DOXt0\n/ga6/1k9r6J6YIkyAlGijA8l4dK/DCYSNTkEMxWT3EbWCzVLtyBc/dvPHlbUHxPK\nZnHxf8DEJhrI1Um/JVFllDozKN+olM1jl4F7G73uB24ei6A7l3aybfvF17CKiFHY\nYU6u4LrsMKBnwvIecbeQgLYBQ3vq4Etfq6M5RP8CgYEAz5d1XuF4zAwlWVXYxGBq\n3AF2wPEUAuOpWIHxNnkSW16LSfTO2V5pR+jt60PIHaJ8J4YnLnsqmEGBwL7i4DbA\nPldj/bsQ9D3dUlMaVSHgEQzvbXr7TcvhDbeBkOgV4MTItpmIX8zNBHJ0Odc49puR\nd64wJpH0y7lbLLvnFH2tcrMCgYEAvzYIQldFwiBl7sPOf09t7bZwy2NaHkrg1kaB\n1c0QZM8NxUw9CeDdYBB72NklmnidK/bX39jsL0CQ5eipgCYphWC8oN/bOfhZ8no4\nhYif3J/Ghi4qEztwm5ScS6nt4tAgJ5p8PXwNnZV7n09gtiIWIO0QpzU800krR/cm\nT6xgR9sCgYAjDvUnfPSloTd9it387DufxC+GDjDO/BvRcsCF7pSHEcR8TPfSBfvJ\nxTDJFr1pI9PL6QAc/XgIFqgPIS23qAd3f9LHOxx14yzJhndgAUSSHJki6C4gyVnM\nsz0Sd9+aAiHTlMJPS4skQSAX1J0uKL+8cpJ3MRcigL9BIsq3zzHHuQKBgQCxsB6A\nt+VFfyH6fc+Zk1COhOnQt+T5HZBOz3q8GjJP2/HqFOzsDyDpsqfEXhaJs+grANqf\nVFA3oQKGBG3vfoc7QShJP33UIyxDHr0DqnEUbw3nh2LmOGhuy+1qiuFb0xjudKtb\n37ovZMhaxUMUPhzeQC8nk1uQ5P/pgo0BoShf3QKBgQCVubEGsW+tKjojfe04LWkD\n4GqMDdN6MtPYtwrUHyJj0E8Onwv3meTUcnvxsgtms0eGFVlxs+lwgeVFKq9w1Jbg\ntOSU3FGv+8WwYPw1s6Jk3iaU3N8HhAk4rPDP4hzjSncmucB9J5j9r9Qxs1deR+NE\nKzP/8UhPVOtdMMu67ag5UQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "maplequad-tradecore@appspot.gserviceaccount.com",
+  "client_id": "117042097519263242137",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/maplequad-tradecore%40appspot.gserviceaccount.com"
+}

@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: fo-ods-ulg
+  labels:
+    app: fo-ods-ulg
+
+spec:
+  replicas: 3
+
+  template:
+    metadata:
+      labels:
+        app: fo-ods-ulg
+
+    spec:
+      containers:
+      - name: fo-ods-ulg-app
+        image: gcr.io/fo-ods/fo-ods-ulg-beta
+        imagePullPolicy: Always
+
+        # The traderepository process listens on port 8080 for web traffic by default.
+        ports:
+        - name: grpc
+          containerPort: 8090
+        env:
+        - name: SERVICE_GRPC_PORT
+          value: "8090"
+        - name: PROJECT_ID
+          value: fo-ods
+        - name: BIGTABLE_INSTANCE_ID
+          value: repository-test

@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sit-xa-tradecore-trade-compression-trade-booking-job
+  labels:
+    app: sit-xa-tradecore-trade-compression-trade-booking-job
+
+spec:
+  completions: 1
+  parallelism: 10
+  template:
+    spec:
+      containers:
+      - name: sit-xa-tradecore-trade-compression-trade-booking
+        image: gcr.io/fo-ods/tradecore-store-api:latest
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        args: ["java", "-cp", "apps/tradecore-store-0.1.0-SNAPSHOT.jar", "com.maplequad.fo.ods.tradecore.store.client.TradeCoreStoreAppClient"]
+        env:
+        - name: TC_TG_ASSET_CLASS
+          value: "fi-irs-ba"
+        - name: TEST_TRADE_COUNT
+          value: "100000"
+        - name: TEST_MAX_TRADE_LEGS
+          value: "2"
+        - name: TEST_MAX_TRADE_PARTIES
+          value: "2"
+        - name: TC_STORE_SRVC_HOST
+          value: "130.211.87.74"
+        - name: TC_STORE_SRVC_PORT
+          value: "3002"
+        - name: NO_OF_THREADS
+          value: "2"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx400m -Xms200m"
+        - name: JAVA_USER_OPTS
+          #value: "-XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+          value: "-XX:+PrintFlagsFinal"
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+      restartPolicy: Never

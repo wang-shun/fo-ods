@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>TradeCore Trade Booking Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Loading Bootstrap -->
+    <link href="flat-ui/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="flat-ui/css/flat-ui.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/trade-order.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/vendor/html5shiv.js"></script>
+      <script src="js/vendor/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<!--div class="container palette-midnight-blue whiteFont"-->
+<div class="container orderPanel">
+    <form class="form" action="/createCashEqTrade" method="post" name="createTradeForm" id="createTradeForm">
+    <input id="spanbidq" type="hidden" value="" />
+    <input id="spanaskq" type="hidden" value="" />
+    <input name="hdnsymbol" id="hdnsymbol" type="hidden" value="" />
+    <input name="hdncurrencyCode" id="hdncurrencyCode" type="hidden" value="" />
+    <input name="hdnexchange" id="hdnexchange" type="hidden" value="" />
+    <input id="spanexchange" type="hidden" value="" />
+    <input name="hdnOrderInd" id="hdnOrderInd" type="hidden" value="" />
+    <input name="hdnUserName" id="hdnUserName" type="hidden" value="" />
+    <input name="hdnSpotRate" id="hdnSpotRate" type="hidden" value="" />
+    
+    <div class="row">
+        <div class="col-md-6 palette-pomegranate"><span class="fui-new"></span>&nbsp;&nbsp;New Trade</div>
+        <div class="col-md-4 palette-pomegranate"><span class="fui-eye"></span>&nbsp;&nbsp;Algo Type: None</span></div>
+        <div class="col-md-2 palette-pomegranate" style="text-align:right"><span class="fui-triangle-down"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fui-gear"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:window.close();"></a><span class="fui-exit"></span></div>
+        <div class="col-xs-12" style="height:10px"></div>
+        <div class="col-md-6" style="font-size: 2.0em; font-weight: bold;"><span id="spansymbol"></span></div>
+        <div class="col-md-1">BID</div>
+        <div class="col-md-2" style="font-size: 2.0em; font-weight: bold;"><span id="spanbid"></span></div>
+        <div class="col-md-1">ASK</div>
+        <div class="col-md-2" style="font-size: 2.0em; font-weight: bold;"><span id="spanask"></span></div>
+
+        <div class="col-md-2">Close</div>
+        <div class="col-md-2"><span id="spanclose"></span></div>
+        <div class="col-md-2">Hi</div>
+        <div class="col-md-2"><span id="spanhigh"></span></div>
+        <div class="col-md-2">Last</div>
+        <div class="col-md-2"><span id="spanprice"></span></div>
+        
+        <div class="col-md-2">Open</div>
+        <div class="col-md-2"><span id="spanopen"></span></div>
+        <div class="col-md-2">Lo</div>
+        <div class="col-md-2"><span id="spanlow"></span></div>
+        <div class="col-md-2">Chg</div>
+        <div class="col-md-2"><span id="spanchg"></span></div>
+
+        <div class="col-xs-12" style="height:6px"></div>
+
+        <div class="col-xs-12">
+            <div class="btn-toolbar">
+                <div class="btn-group">
+                    <a class="btn btn-lg btn-success" style="width: 100px;" href="javascript:fnSetOrderInd('B');">BUY</a>
+                    <a class="btn btn-lg btn-danger active" style="width: 100px;" href="javascript:fnSetOrderInd('S')">SELL</a>
+                    <a class="btn btn-lg btn-info" style="width: 100px;" href="javascript:fnSetOrderInd('N')">SHORT</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12" style="height:10px"></div>
+
+        <div class="col-md-6">Time In Force</div>
+
+        <div class="col-md-6">Trade Type</div>
+        
+        <div class="col-md-6">
+            <select class="form-control select select-inverse" data-toggle="select" name="timeInForce">
+                <option value="DAY" selected>Day</option>
+                <option value="IOC">Immediate Or Cancel</option>
+                <option value="ORD">Order</option>
+                <option value="GTM">Good This Month</option>
+                <option value="OPN">Open</option>
+                <option value="KIL">Kill</option>
+                <option value="HPP">At The Highest Possible Price</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <select class="form-control select select-inverse" data-toggle="select" name="orderType">
+                <option value="Market" selected>Market</option>
+                <option value="Limit">Limit</option>
+            </select>
+        </div>
+        
+        <div class="col-xs-12" style="height:10px"></div>
+
+        <div class="col-md-6">Price</div>
+        <div class="col-md-6">&nbsp;</div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <input type="text" id="price" name="price" value="" placeholder="Price" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-3"><span style="display: inline-block; margin-top: 6px" id="spancurrencyCode"></span></div>
+        <div class="col-md-3">Hedge &nbsp;&nbsp;&nbsp;<input type="checkbox" id="hedgeFlag" name="hedgeFlag" checked data-toggle="switch" id="custom-switch-01"
+    /></div>
+        <div class="col-md-3"> 
+        <select class="form-control select select-inverse" data-toggle="select" id="hedgeCurrency"  name="hedgeCurrency" onchange="fnChangeCurrency()">
+                <option value="AUD">AUD</option>
+                <option value="CAD">CAD</option>
+                <option value="EUR">EUR</option>
+                <option value="CHF">CHF</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="USD">USD</option>
+            </select>
+        </div>
+        
+        <div class="col-xs-12"></div>
+
+        <div class="col-md-6">Quantity</div>
+        <div class="col-md-6">Exchange Rate</div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <input id="quantity" name="quantity" type="text" value="" placeholder="Quantity" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+        <div class="col-md-3"><span id="hdnExchangeRate"></span></div>
+        <div class="col-md-3"></div>
+        
+        <div class="col-xs-12"></div>
+
+        <div class="col-md-6">Route</div>
+        <div class="col-md-6">Book</div>
+
+        <div class="col-md-6">
+            <select class="form-control select select-inverse" data-toggle="select" name="tradeRoute">
+                <option value="EMMA" selected>EMMA</option>
+                <option value="EMMA2">EMMA2</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+            <select class="form-control select select-inverse" data-toggle="select" name="tradeBook">
+                <option value="Book1" selected>Book1</option>
+                <option value="Book2">Book2</option>
+            </select>
+        </div>
+        <div class="col-xs-12">&nbsp;</div>
+
+        <div class="col-md-6">XLON/LSE-SETS</div>
+        <div class="col-md-3">FEX</div>
+        <div class="col-md-3" style="text-align: right">
+                <input type="button" id="btnBuySell" class="btn btn-lg btn-danger" value="Book Trade" onclick="javascript:submit();" />
+        </div>
+        <div class="col-xs-12" style="height:18px"></div>
+
+    </div>
+     </div>
+    </div>
+    </form>
+</div>
+    <!-- /.container -->
+    <!-- jQuery (necessary for Flat UI's JavaScript plugins) -->
+    <script src="flat-ui/js/vendor/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="flat-ui/js/flat-ui.min.js"></script>
+    <script src="flat-ui/js/application.js"></script>
+    <script src="scripts/casheq-trade.js"></script>
+    <script>
+    onload();
+    fnChangeCurrency();
+    </script>
+</body>
+
+</html>

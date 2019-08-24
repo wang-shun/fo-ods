@@ -1,0 +1,52 @@
+{
+    "rules": {
+        "messages": {
+            ".read": "auth !== null",
+            ".write": "auth !== null"
+        },
+        "eqtTradeGrid": {
+            ".read": true,
+            ".write": true
+        },
+        "irdTradeGrid": {
+            ".read": true,
+            ".write": true
+        },
+        "fxdTradeGrid": {
+            ".read": true,
+            ".write": true
+        },
+        "irdBulkAmendGrid": {
+            ".read": true,
+            ".write": true
+        },
+        "eqtBulkAmendGrid": {
+            ".read": true,
+            ".write": true
+        },
+        "fxdBulkAmendGrid": {
+            ".read": true,
+            ".write": true
+        },
+        "fxsMarketDataGridRef": {
+            ".read": true,
+            ".write": true
+        },
+        "eqtMarketDataGridRef": {
+            ".read": true,
+            ".write": true
+        },
+        "irdBulkAmendDetailsGrid": {
+            ".read": true,
+            ".write": true
+        },
+        "eqtBulkAmendDetailsGrid": {
+            ".read": true,
+            ".write": true
+        },
+        "fxdBulkAmendDetailsGrid": {
+            ".read": true,
+            ".write": true
+        }
+    }
+}

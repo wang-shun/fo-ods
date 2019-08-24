@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sit-eq-tradecore-vs
+  labels:
+    app: sit-eq-tradecore-vs
+
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: sit-eq-tradecore-vs
+    spec:
+      containers:
+      - name: sit-eq-tradecore-vs
+        image: gcr.io/fo-ods/tradecore-vs
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        env:
+        - name: TC_PROJECT_ID
+          value: "fo-ods"
+        - name: TC_ASSET_CLASS
+          value: "eqt"
+        - name: TC_VS_DLT_TOPIC_SUBS
+          value: "sit-eq-lcm-feed-vs-sub"
+        - name: TC_FB_SRVC_ACCT_KEY
+          value: "src/main/resources/service-account/fo-ods-cred.json"
+        - name: TC_FB_DB_URL
+          value: "https://fo-ods.firebaseio.com"
+        - name: TC_FB_BASE_GRID
+          value: "eqtTradeGrid"
+        - name: TC_FB_SAVE_FLAG
+          value: "true"
+        - name: TC_FB_AUTH_ID
+          value: "tradecore"
+        - name: TC_FB_AUTH_VALUE
+          value: "tradecore"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx500m -Xms200m"
+        - name: JAVA_USER_OPTS
+          value: "-XX:+PrintFlagsFinal"

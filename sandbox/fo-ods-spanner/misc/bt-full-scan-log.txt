@@ -1,0 +1,43 @@
+08:25:08.555 [main] INFO  FullScanMain - project=fo-ods, bigtable instanceId=bigtable-test
+08:25:08.983 [main] INFO  c.g.c.bigtable.grpc.BigtableSession - Opening connection for projectId fo-ods, instanceId bigtable-test, on data host bigtable.googleapis.com, table admin host bigtableadmin.googleapis.com.
+08:25:09.005 [main] INFO  c.g.c.bigtable.grpc.BigtableSession - Bigtable options: BigtableOptions{dataHost=bigtable.googleapis.com, tableAdminHost=bigtableadmin.googleapis.com, instanceAdminHost=bigtableadmin.googleapis.com, projectId=fo-ods, instanceId=bigtable-test, userAgent=hbase-1.3.1, credentialType=DefaultCredentials, port=443, dataChannelCount=10, retryOptions=RetryOptions{retriesEnabled=true, allowRetriesWithoutTimestamp=false, statusToRetryOn=[UNAUTHENTICATED, DEADLINE_EXCEEDED, INTERNAL, ABORTED, UNAVAILABLE], initialBackoffMillis=5, maxElapsedBackoffMillis=60000, backoffMultiplier=2.0, streamingBufferSize=60, readPartialRowTimeoutMillis=3600000, maxScanTimeoutRetries=1}, bulkOptions=BulkOptions{asyncMutatorCount=2, useBulkApi=true, bulkMaxKeyCount=25, bulkMaxRequestSize=1048576, autoflushMs=0, maxInflightRpcs=500, maxMemory=190893260, enableBulkMutationThrottling=false, bulkMutationRpcTargetMs=100}, callOptionsConfig=CallOptionsConfig{useTimeout=false, shortRpcTimeoutMs=60000, longRpcTimeoutMs=600000}, usePlaintextNegotiation=false}.
+08:25:09.417 [Credentials-Refresh-0] INFO  c.g.c.b.g.i.RefreshingOAuth2CredentialsInterceptor - Refreshing the OAuth token
+08:50:19.364 [grpc-default-executor-1] INFO  c.g.c.b.g.a.AbstractRetryingOperation - Retrying failed call. Failure #1, got: Status{code=DEADLINE_EXCEEDED, description=Error while reading table 'projects/fo-ods/instances/bigtable-test/tables/trades3', cause=null} on channel 1
+Exception in thread "main" java.lang.RuntimeException: com.google.cloud.bigtable.grpc.scanner.BigtableRetriesExhaustedException: Exhausted streaming retries.
+	at org.apache.hadoop.hbase.client.AbstractClientScanner$1.hasNext(AbstractClientScanner.java:97)
+	at FullScanMain.doFind(FullScanMain.java:76)
+	at FullScanMain.main(FullScanMain.java:64)
+Caused by: com.google.cloud.bigtable.grpc.scanner.BigtableRetriesExhaustedException: Exhausted streaming retries.
+	at com.google.cloud.bigtable.grpc.scanner.ResumingStreamingResultScanner.next(ResumingStreamingResultScanner.java:88)
+	at com.google.cloud.bigtable.grpc.scanner.ResumingStreamingResultScanner.next(ResumingStreamingResultScanner.java:34)
+	at com.google.cloud.bigtable.hbase.adapters.read.BigtableResultScannerAdapter$1.next(BigtableResultScannerAdapter.java:57)
+	at org.apache.hadoop.hbase.client.AbstractClientScanner$1.hasNext(AbstractClientScanner.java:94)
+	... 2 more
+Caused by: com.google.cloud.bigtable.grpc.io.IOExceptionWithStatus: Error in response stream
+	at com.google.cloud.bigtable.grpc.scanner.ResultQueueEntry$ExceptionResultQueueEntry.getResponseOrThrow(ResultQueueEntry.java:88)
+	at com.google.cloud.bigtable.grpc.scanner.ResponseQueueReader.getNextMergedRow(ResponseQueueReader.java:91)
+	at com.google.cloud.bigtable.grpc.scanner.ResumingStreamingResultScanner.next(ResumingStreamingResultScanner.java:79)
+	... 5 more
+Caused by: com.google.cloud.bigtable.grpc.scanner.BigtableRetriesExhaustedException: Exhausted retries after 2 failures.
+	at com.google.cloud.bigtable.grpc.async.AbstractRetryingOperation.getExhaustedRetriesException(AbstractRetryingOperation.java:188)
+	at com.google.cloud.bigtable.grpc.async.AbstractRetryingOperation.onError(AbstractRetryingOperation.java:175)
+	at com.google.cloud.bigtable.grpc.async.AbstractRetryingOperation.onClose(AbstractRetryingOperation.java:143)
+	at com.google.cloud.bigtable.grpc.scanner.RetryingReadRowsOperation.onClose(RetryingReadRowsOperation.java:130)
+	at com.google.cloud.bigtable.grpc.io.ChannelPool$InstrumentedChannel$2.onClose(ChannelPool.java:210)
+	at io.grpc.ForwardingClientCallListener.onClose(ForwardingClientCallListener.java:41)
+	at com.google.cloud.bigtable.grpc.io.RefreshingOAuth2CredentialsInterceptor$UnAuthResponseListener.onClose(RefreshingOAuth2CredentialsInterceptor.java:416)
+	at io.grpc.internal.ClientCallImpl.closeObserver(ClientCallImpl.java:419)
+	at io.grpc.internal.ClientCallImpl.access$100(ClientCallImpl.java:60)
+	at io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl.close(ClientCallImpl.java:493)
+	at io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl.access$500(ClientCallImpl.java:422)
+	at io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl$1StreamClosed.runInContext(ClientCallImpl.java:525)
+	at io.grpc.internal.ContextRunnable.run(ContextRunnable.java:37)
+	at io.grpc.internal.SerializingExecutor.run(SerializingExecutor.java:102)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: io.grpc.StatusRuntimeException: DEADLINE_EXCEEDED: Error while reading table 'projects/fo-ods/instances/bigtable-test/tables/trades3'
+	at io.grpc.Status.asRuntimeException(Status.java:517)
+	... 17 more
+
+Process finished with exit code 1

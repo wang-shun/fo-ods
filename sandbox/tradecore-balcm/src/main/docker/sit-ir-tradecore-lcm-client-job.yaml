@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sit-ir-tradecore-lcm-client
+  labels:
+    app: sit-ir-tradecore-lcm-client
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      containers:
+      - name: sit-ir-tradecore-lcm-client
+        image: gcr.io/fo-ods/tradecore-balcm:latest
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        args: ["java", "-cp", "apps/tradecore-balcm-0.1.0-SNAPSHOT.jar", "com.maplequad.fo.ods.tradecore.balcmlcm.client.TradeCoreLCMAppClient", "fi-irs-ba", "35.195.236.201","3000", "10", "2","3"]
+        #146.148.116.205
+        #35.195.88.22
+        env:
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx400m -Xms200m"
+        - name: JAVA_USER_OPTS
+          #value: "-XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+          value: "-XX:+PrintFlagsFinal"
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+      restartPolicy: Never

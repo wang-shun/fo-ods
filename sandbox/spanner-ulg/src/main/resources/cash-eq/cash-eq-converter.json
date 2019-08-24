@@ -1,0 +1,314 @@
+{
+  "trade": [
+    {
+      "tableName": "TRADE",
+      "attributes": [
+        {
+          "column": "tradeId",
+          "datatype": "long",
+          "type": "sequence"
+        },
+        {
+          "column": "createdBy",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "username"
+        },
+        {
+          "column": "createdTimeStamp",
+          "datatype": "timestamp",
+          "type": "timestamp"
+        },
+        {
+          "column": "origSystem",
+          "datatype": "string",
+          "type": "fixed",
+          "value": "pts"
+        },
+        {
+          "column": "osTradeId",
+          "datatype": "long",
+          "type": "straight-pull",
+          "name": "sequenceNumber"
+        },
+        {
+          "column": "primaryAssetClass",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "assetClass"
+        },
+        {
+          "column": "productType",
+          "datatype": "string",
+          "type": "fixed",
+          "value": "cash-eq"
+        },
+        {
+          "column": "tradeDate",
+          "datatype": "date",
+          "type": "straight-pull",
+          "name": "tradeDate"
+        }
+      ]
+    },
+    {
+      "tableName": "TRADE_EVENT",
+      "attributes": [
+        {
+          "column": "tradeId",
+          "datatype": "long",
+          "type": "current",
+          "name": "tradeId"
+        },
+        {
+          "column": "validFromTimestamp",
+          "datatype": "timestamp",
+          "type": "straight-pull",
+          "name": "executionTime"
+        },
+        {
+          "column": "createdTimeStamp",
+          "datatype": "timestamp",
+          "type": "timestamp"
+        },
+        {
+          "column": "parentTradeId",
+          "datatype": "long",
+          "type": "fixed",
+          "value": "0"
+        },
+        {
+          "column": "eventType",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "ptsFolioId"
+        },
+        {
+          "column": "eventStatus",
+          "datatype": "string",
+          "type": "fixed",
+          "value": "new"
+        },
+        {
+          "column": "eventReference",
+          "datatype": "string",
+          "type": "fixed",
+          "value": "New booking in PTS"
+        },
+        {
+          "column": "noOfLegs",
+          "datatype": "long",
+          "type": "rowcount",
+          "name": "noOfLegs"
+        },
+        {
+          "column": "exchangeExecutionId",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "exchangeExecutionId"
+        },
+        {
+          "column": "orderId",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "emsOrderId"
+        },
+        {
+          "column": "osVersion",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "osVersion"
+        },
+        {
+          "column": "osVersionStatus",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "osVersionStatus"
+        },
+        {
+          "column": "rpSalesman",
+          "datatype": "string",
+          "type": "fixed",
+          "value": ""
+        },
+        {
+          "column": "rpSalesmanCountry",
+          "datatype": "string",
+          "type": "fixed",
+          "value": ""
+        },
+        {
+          "column": "rpTrader",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "username"
+        },
+        {
+          "column": "rpTraderCountry",
+          "datatype": "string",
+          "type": "fixed",
+          "value": "UK"
+        },
+        {
+          "column": "createdBy",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "username"
+        }
+      ]
+    },
+    {
+      "tableName": "TRADE_PARTY",
+      "attributes": [
+        {
+          "column": "tradeId",
+          "datatype": "long",
+          "type": "current",
+          "name": "tradeId"
+        },
+        {
+          "column": "validFromTimestamp",
+          "datatype": "timestamp",
+          "type": "straight-pull",
+          "name": "executionTime"
+        },
+        {
+          "column": "createdTimeStamp",
+          "datatype": "timestamp",
+          "type": "current",
+          "name": "createdTimeStamp"
+        },
+        {
+          "column": "partyRef",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "ptsEntityId"
+        },
+        {
+          "column": "partyRole",
+          "datatype": "string",
+          "type": "fixed",
+          "value": "oboParty"
+        }
+      ]
+    },
+    {
+      "tableName": "TRADE_LEG",
+      "attributes": [
+        {
+          "column": "tradeId",
+          "datatype": "long",
+          "type": "current",
+          "name": "tradeId"
+        },
+        {
+          "column": "validFromTimestamp",
+          "datatype": "timestamp",
+          "type": "straight-pull",
+          "name": "executionTime"
+        },
+        {
+          "column": "createdTimeStamp",
+          "datatype": "timestamp",
+          "type": "current",
+          "name": "createdTimeStamp"
+        },
+        {
+          "column": "legNumber",
+          "datatype": "long",
+          "type": "rowcounter"
+        },
+        {
+          "column": "book",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "ptsEntityId"
+        },
+        {
+          "column": "cfiCode",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "cfiCode"
+        },
+        {
+          "column": "currency",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "currency"
+        },
+        {
+          "column": "exchange",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "market"
+        },
+        {
+          "column": "grossPrice",
+          "datatype": "float",
+          "type": "straight-pull",
+          "name": "amount"
+        },
+        {
+          "column": "instrumentId",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "symbol"
+        },
+        {
+          "column": "internalProductRef",
+          "datatype": "string",
+          "type": "fixed",
+          "value": ""
+        },
+        {
+          "column": "internalProductType",
+          "datatype": "string",
+          "type": "fixed",
+          "value": ""
+        },
+        {
+          "column": "isin",
+          "datatype": "string",
+          "type": "fixed",
+          "value": ""
+        },
+        {
+          "column": "price",
+          "datatype": "float",
+          "type": "straight-pull",
+          "name": "price"
+        },
+        {
+          "column": "quantity",
+          "datatype": "long",
+          "type": "straight-pull",
+          "name": "quantityFilled"
+        },
+        {
+          "column": "ric",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "symbol"
+        },
+        {
+          "column": "settlementAmount",
+          "datatype": "float",
+          "type": "straight-pull",
+          "name": "amount"
+        },
+        {
+          "column": "settlementCcy",
+          "datatype": "string",
+          "type": "straight-pull",
+          "name": "currency"
+        },
+        {
+          "column": "settlementDate",
+          "datatype": "date",
+          "type": "fixed",
+          "value": "2018-12-31"
+        }
+      ]
+    }
+  ]
+}

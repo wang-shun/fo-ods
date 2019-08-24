@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "foods.traderepository.proto";
+option java_outer_classname = "TradeRepositoryProto";
+option objc_class_prefix = "TR";
+
+package traderepository;
+
+// Interface exported by the server.
+service TradeRepository {
+  rpc SaveTrade(SaveTradeRequest) returns (SaveTradeResponse) {}
+  rpc GetLatestVersion(GetLatestVersionRequest) returns (GetLatestVersionResponse) {}
+  rpc FindTrades(FindTradesRequest) returns (FindTradesResponse) {}
+
+  // A server-to-client streaming RPC.
+  //
+  // Obtains the Features available within the given Rectangle.  Results are
+  // streamed rather than returned at once (e.g. in a response message with a
+  // repeated field), as the rectangle may cover a large area and contain a
+  // huge number of features.
+  //rpc ListFeatures(Rectangle) returns (stream Feature) {}
+
+  // A client-to-server streaming RPC.
+  //
+  // Accepts a stream of Points on a route being traversed, returning a
+  // RouteSummary when traversal is completed.
+  //rpc RecordRoute(stream Point) returns (RouteSummary) {}
+
+  // A Bidirectional streaming RPC.
+  //
+  // Accepts a stream of RouteNotes sent while a route is being traversed,
+  // while receiving other RouteNotes (e.g. from other users).
+  //rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+}
+
+message EquityTrade {
+  // foods.bigtable.model.EquityTrade encoded wit GSon
+  string json = 1;
+}
+
+message SaveTradeRequest {
+  EquityTrade trade = 1;
+}
+
+message SaveTradeResponse {
+  //string rowkey = 1;
+}
+
+message GetLatestVersionRequest {
+  string tradeId = 1;
+}
+
+message GetLatestVersionResponse {
+  EquityTrade trade = 1;
+}
+
+message FindTradesRequest {
+  repeated QueryPredicate predicate = 1;
+  // default value 0 means return all rows
+  int64 maxRows = 2;
+}
+
+message FindTradesResponse {
+  repeated EquityTrade trade = 1;
+}
+
+enum PredicateType {
+  BOOK = 0;
+  INSTRUMENT_RIC = 1;
+  CCY = 2;
+}
+
+enum CompareOpType {
+  EQUAL = 0;
+  LESS = 1;
+  LESS_OR_EQUAL = 2;
+  NOT_EQUAL = 3;
+  GREATER_OR_EQUAL = 4;
+  GREATER = 5;
+}
+
+message QueryPredicate {
+  CompareOpType compareOp = 1;
+  PredicateType predicateType = 2;
+  string value = 3;
+}

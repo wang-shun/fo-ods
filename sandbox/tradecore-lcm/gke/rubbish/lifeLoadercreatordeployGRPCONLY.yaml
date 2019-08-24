@@ -1,0 +1,59 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tradecore-servicelayer
+  labels:
+    app: tradecore-servicelayer
+
+# The traderepository frontend replica set ensures that at least 3
+# instances of the traderepository app are running on the cluster.
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: tradecore-servicelayer
+
+    spec:
+      containers:
+      - name: tradecore-servicelayer
+        # Replace [GCLOUD_PROJECT] with your project ID.
+        image: eu.gcr.io/fo-ods/tradecore-servicelayer:v1
+
+        # This setting makes nodes pull the docker image every time before
+        # starting the pod. This is useful when debugging, but should be turned
+        # off in production.
+        imagePullPolicy: Always
+
+        # The traderepository process listens on port 8080 for web traffic by default.
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 443
+        - name: grpc
+          containerPort: 3000
+        env:
+        - name: SERVICE_HTTP_PORT
+          value: "8080"
+        - name: PROJECT_ID
+          value: fo-ods
+        - name: ULT_SUB_ID
+          value: ultpullsubscription
+        - name: DLT_PUBSUB_TOPIC
+          value: dltpubsubtopic
+        - name: PUBSUB_TOPIC
+          value: ultpullpubsubtopic
+        - name: GRPC_PORT
+          value: "3000"
+        - name: CRUD_HOST
+          value: "35.189.219.191"
+        - name: CRUD_PORT
+          value: "5555"
+        - name: SUBSCRIBER_THREADS
+          value: "4"
+        - name: RUNULTPUB_SUB
+          value: "N"

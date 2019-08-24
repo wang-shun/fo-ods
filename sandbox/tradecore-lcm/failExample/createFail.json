@@ -1,0 +1,109 @@
+{
+  "action": "CREATE",
+  "batchnumOfTrades": "10",
+  "batchserialnum": "103787386713360516",
+  "begintimestamp": "1504546275893",
+  "createdBy": "mattandr",
+  "createdTimeStamp": {
+    "nanos": 893000000.0,
+    "seconds": 1504546275.0
+  },
+  "origSystem": "TradeCoreSelfGen8",
+  "osTradeId": "3761244277362084887",
+  "primaryAssetClass": "equities",
+  "productType": "cash-equities",
+  "subnumber": "3",
+  "tradeDate": "Sep 4, 2017 5:31:15 PM",
+  "tradeEventList": [
+    {
+      "activeFlag": false,
+      "eventReference": "f60ea9e3-7f52-4e27-821b-82de4a73df4f",
+      "eventStatus": "NEW",
+      "eventType": "NEW",
+      "exchangeExecutionId": "EE-JHXHFSAOL-77671058",
+      "noOfLegs": 2.0,
+      "orderId": "663b6f07-e28a-4d9e-9f9d-77295e747e40",
+      "osVersion": "1",
+      "osVersionStatus": "NEW",
+      "parentTradeId": "",
+      "salesman": "Soloman",
+      "salesmanCountry": "UK",
+      "tradeLegList": [
+        {
+          "book": "290557",
+          "buySellInd": "B",
+          "cfiCode": "VOQMKQPCNA",
+          "currency": "HKD",
+          "exchange": "FEX",
+          "grossPrice": 206806592.0,
+          "instrumentId": "SGRL.G",
+          "internalProductRef": "RVPIY-7262545603",
+          "internalProductType": "IRS36",
+          "isin": "ISIN-YWJWSFEXQ",
+          "legNumber": 1.0,
+          "legType": "equities",
+          "price": 2563.93,
+          "quantity": 80660.0,
+          "ric": "RIC-CMCMPQPIUQIK",
+          "validTimeFrom": {
+            "nanos": 893000000.0,
+            "seconds": 1504546275.0
+          },
+          "validTimeTo": {
+            "nanos": 999999999.0,
+            "seconds": 253402300799.0
+          }
+        },
+        {
+          "book": "290555",
+          "buySellInd": "B",
+          "cfiCode": "CEUBUHKYQQ",
+          "currency": "INR",
+          "exchange": "LSE",
+          "grossPrice": 108023288.0,
+          "instrumentId": "LTTP.T",
+          "internalProductRef": "HFWXS-8301131043",
+          "internalProductType": "IRS48",
+          "isin": "ISIN-BGXPLGTJB",
+          "legNumber": 2.0,
+          "legType": "equities",
+          "price": 2825.32,
+          "quantity": 38234.0,
+          "ric": "RIC-XXBGUUBMWIXE",
+          "validTimeFrom": {
+            "nanos": 893000000.0,
+            "seconds": 1504546275.0
+          },
+          "validTimeTo": {
+            "nanos": 999999999.0,
+            "seconds": 253402300799.0
+          }
+        }
+      ],
+      "tradePartyList": [
+        {
+          "partyRef": "77aec080-abce-40a5-9715-6d99f47d403c",
+          "partyRole": "OnBehalfOfParty",
+          "validTimeFrom": {
+            "nanos": 893000000.0,
+            "seconds": 1504546275.0
+          },
+          "validTimeTo": {
+            "nanos": 999999999.0,
+            "seconds": 253402300799.0
+          }
+        }
+      ],
+      "trader": "Roman",
+      "traderCountry": "USA",
+      "validTimeFrom": {
+        "nanos": 893000000.0,
+        "seconds": 1504546275.0
+      },
+      "validTimeTo": {
+        "nanos": 999999999.0,
+        "seconds": 253402300799.0
+      }
+    }
+  ]
+}

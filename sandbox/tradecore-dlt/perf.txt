@@ -1,0 +1,513 @@
+---------------- query stats for a run ------------------
+
+--select * from stats
+--where serialNumber=9149614424335927561
+--order by ult desc
+
+select count(1) cnt,
+       min(dbTime) dbMin, avg(dbTime) dbAvg, max(dbTime) dbMax,
+       min(lcTime) lcMin, avg(lcTime) lcAvg, max(lcTime) lcMax,
+       min(totalLcmToDltTime) totalMin, avg(totalLcmToDltTime) totalAvg, max(totalLcmToDltTime) totalMax,
+       min(lcStart) lcStart, max(dltArriveTime) dltFinish, TIMESTAMP_DIFF(max(dltArriveTime), min(lcStart), SECOND) elapsed
+from stats
+where serialNumber=9097540073968650388
+
+select serialNumber, count(1) cnt,
+       min(dbTime) dbMin, avg(dbTime) dbAvg, max(dbTime) dbMax,
+       min(lcTime) lcMin, avg(lcTime) lcAvg, max(lcTime) lcMax,
+       min(totalLcmToDltTime) totalMin, avg(totalLcmToDltTime) totalAvg, max(totalLcmToDltTime) totalMax,
+       min(lcStart) lcStart, max(dltArriveTime) dltFinish,
+       TIMESTAMP_DIFF(max(dltArriveTime), min(lcStart), SECOND) elapsed,
+       count (1) / (TIMESTAMP_DIFF(max(dltArriveTime), min(lcStart), SECOND) + 0.0001) throughput
+from stats
+--where serialNumber=              4077972195746860362
+group by serialNumber
+order by min(dltArriveTime) desc
+
+
+
+select * from stats where serialNumber=9097540073968650388
+--order by lcStart desc
+order by dbTime desc
+
+----------- LCM with mock store service
+1 pod, 1 thread
+1k 3112502634266117538: 17s
+10k 8795468394717004195: 72s
+
+1 pod, 4 threads
+1k 4077972195746860362: 15s
+10k 211020547236643887: 74s
+
+4 pods, 4 threads:
+10k 1660834732289966806: 49s
+
+8 pods, 4 threads:
+1k 7088239245583401559: 4s
+10k: 3488314310630394451: 31s
+
+----------- LCM with mock store service - next day, after picking up latest changes:
+  - "commit" each published message in lcm
+  - data model changes etc
+
+1 pod, 4 thread
+1k: 8s
+  8481348382907778939
+  175450251864785228
+  8979190658918204669
+
+10k: 75s
+  1172420591682929436
+  7798692026624065954
+  4747411439836088070
+
+10k: -- 4 ULT instances
+  3542966596353411653 = 74s, maxTotal=22s
+  8290330488523473534 = 82s, maxTotal=24s
+
+  after restart:
+  6553182071124217375 = 50s, maxTotal=0.5s
+  904320691521605412 = 50s, maxTotal=0.7s
+
+  after adding multiple threads to ULT
+  4425358576231336419 = 48s, maxTotal=0.6s
+
+  after LCM crashed with OOM and everything restarted:
+  8734104163203368437 = 63s, maxTotal=0.5s
+  5606697625790857706 = 52s, maxTotal=0.7s
+  8499495779811279162 = 48s, maxTotal=0.3s
+
+  after another OOM crash and restarting everything with Xmx
+  4574693877789509482 = 44s, maxTotal=0.5s
+
+-- increased memory limits, using flow control with maxElem=1000, maxByte=20%
+4 ULT instances
+50k:
+  1460413847942745801 = 196s, 50129 trades, maxTotal=0.8s
+
+
+
+-------- ULT, LCM refactored, fixed issues with duplicate messages/crashes/OOM
+
+LCM: 1 pod, 4 threads
+DLT: 4 pods x 10 threads
+
+10k:
+  7803564298755066521 - 34s
+  8200504285697294441 - 66s
+
+100k:
+  4407041608343833515 - 343s, 291
+  2320039573585284902 - 350s, 285
+
+500k:
+  7817619498284763829 - 1731s, 288
+  1793837776388901599 - 2018s, 247
+  5124734135381149181 - 2159s, 231
+
+
+LCM: 4 pods x 4 threads
+100k:
+  2294140284703886437 - 173s, 578 qps
+  8623104892018118451 - 132s, 757
+  7075613662496836690 - 115s, 869
+
+500k:
+  8728080067490824329 - 633s, 790
+  308586850142668379 -  780s, 631
+  297155087611285493 -  902s, 554
+  8344700102277091062 - 603s, 829
+
+LCM: 8 pods x 4 threads
+1.2m:
+  1017: 437s, 2688
+
+
+
+stuck messages:
+ in eqtradecore-lcm-564635762-fw2vv, got delivered after the pod was restarted
+
+---------------
+
+Stuck messages: (UTC)
+15:53 - 6k+ messages stuck in roman-ult-eq-sub-lcm-fff
+15:56 - LCM restarted. Messages are not delivered..
+
+same thing with LCM restarted at 16:30, 2804 messages still stuck
+
+---------------------------------------------------------
+1000
+14:05:24.798 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=HISTOGRAM, name=dbTime, count=1000, min=15, max=256, mean=25.856958255024015, stddev=18.913371724434878, median=20.0, p75=23.0, p95=76.0, p98=87.0, p99=89.0, p999=228.0
+14:05:24.799 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=HISTOGRAM, name=lcCrudTime, count=1000, min=16, max=293, mean=31.324604358277863, stddev=22.868555646630995, median=23.0, p75=27.0, p95=83.0, p98=90.0, p99=92.0, p999=259.0
+14:05:24.799 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=HISTOGRAM, name=lcTime, count=1000, min=17, max=293, mean=31.509558496170662, stddev=22.922465228509804, median=23.0, p75=28.0, p95=84.0, p98=90.0, p99=92.0, p999=259.0
+14:05:24.800 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=HISTOGRAM, name=lcToDbTime, count=1000, min=0, max=69, mean=2.549821486101626, stddev=7.776643890608032, median=1.0, p75=2.0, p95=4.0, p98=18.0, p99=58.0, p999=68.0
+14:05:24.800 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=HISTOGRAM, name=lcToDltTime, count=1000, min=14, max=1017, mean=90.96174881243243, stddev=92.12709023925824, median=85.0, p75=115.0, p95=129.0, p98=302.0, p99=662.0, p999=944.0
+14:05:24.800 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=HISTOGRAM, name=totalLcmToDltTime, count=1000, min=38, max=1087, mean=122.47130730860304, stddev=98.92909797727943, median=113.0, p75=139.0, p95=206.0, p98=351.0, p99=684.0, p999=1033.0
+14:05:24.801 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=HISTOGRAM, name=totalTime, count=1000, min=1174, max=18142, mean=10236.256094443524, stddev=5084.029151047295, median=10550.0, p75=14957.0, p95=17366.0, p98=17679.0, p99=17910.0, p999=18142.0
+14:05:24.801 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=HISTOGRAM, name=ultToLc, count=1000, min=172, max=18024, mean=10113.784787134937, stddev=5112.754801703109, median=10443.0, p75=14850.0, p95=17223.0, p98=17566.0, p99=17795.0, p999=18024.0
+14:05:24.801 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=METER, name=errors, count=0, mean_rate=0.0, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second
+14:05:24.801 [metrics-logger-reporter-1-thread-1] INFO  foods.dlt.stats.StatsSubscriber - type=METER, name=requests, count=1000, mean_rate=0.5376412556517157, m1=2.4237836207591687E-12, m5=0.00901315606823259, m15=0.1547844155867119, rate_unit=events/second
+
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+
+9149614424335927561
+
+cnt	dbMin	dbAvg	dbMax	lcMin	lcAvg	lcMax	totalMin	totalAvg	totalMax	lcStart	dltFinish	elapsed
+1000	14	27.233999999999998	276	16	32.38199999999998	289	30	125.90399999999995	1184	2017-09-11T16:43:19.992Z	2017-09-11T16:43:37.682Z	17
+
+---------------------------------------------------------
+
+
+17:46:06.339 [pool-1-thread-1] INFO  c.m.f.o.t.s.s.TradeCoreStoreService - insertTrade 5251672282146295608: tradeDate: 1505151892000
+osTradeId: "5251672282146295608"
+17:46:06.339 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.s.DataAccessService - Inserting trade Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+17:46:06.387 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.m.TradeMutation - upsert entered for table TRADE with Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=2017-09-11T17:46:06.387000000Z', transactionTimeTo=9999-12-31T23:59:59.999999999Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+osTradeId: "5251672282146295608"
+Caused by: com.google.cloud.spanner.SpannerException: ALREADY_EXISTS: io.grpc.StatusRuntimeException: ALREADY_EXISTS: Unique index violation on index searchByOSTradeID at index key [5251672282146295608,8996465878929457539]. It conflicts with row [8996465878929457539] in table TRADE.
+Caused by: java.util.concurrent.ExecutionException: io.grpc.StatusRuntimeException: ALREADY_EXISTS: Unique index violation on index searchByOSTradeID at index key [5251672282146295608,8996465878929457539]. It conflicts with row [8996465878929457539] in table TRADE.
+Caused by: io.grpc.StatusRuntimeException: ALREADY_EXISTS: Unique index violation on index searchByOSTradeID at index key [5251672282146295608,8996465878929457539]. It conflicts with row [8996465878929457539] in table TRADE.
+
+
+17:46:06.395 [pool-1-thread-2] INFO  c.m.f.o.t.s.d.a.m.TradeMutation - upsert exited for table TRADE
+Sep 11, 2017 5:46:06 PM io.grpc.internal.SerializingExecutor run
+SEVERE: Exception while executing runnable io.grpc.internal.ServerImpl$JumpToApplicationThreadServerStreamListener$2@708b5d25
+java.lang.RuntimeException: Cannot insert the trade: tradeDate: 1505151892000
+assetClass: "equities"
+productType: "cash-equities"
+origSystem: "TradeCoreSelfGen5"
+osTradeId: "5251672282146295608"
+createdTimeStamp {
+  seconds: 1505151892
+  nanos: 771000000
+}
+tradeEvents {
+  validTimeFrom {
+    seconds: 1505151966
+    nanos: 337000000
+  }
+  validTimeTo {
+    seconds: 253402300799
+    nanos: 999999999
+  }
+  eventType: "CREATE"
+  eventStatus: "DONE"
+  eventReference: "6019f2b2-eb48-45bf-b679-f82071333fb4"
+  noOfLegs: 2
+  osVersion: "1"
+  osVersionStatus: "NEW"
+  orderId: "6677a54b-7190-4e38-b9be-9ea2abf72da5"
+  exchangeExecutionId: "EE-JQDSXVYUH-44821354"
+  trader: "Madhav"
+  salesman: "John"
+  traderCountry: "ITA"
+  salesmanCountry: "UK"
+  tradeParties {
+    validTimeFrom {
+      seconds: 1505151966
+      nanos: 337000000
+    }
+    validTimeTo {
+      seconds: 253402300799
+      nanos: 999999999
+    }
+    partyRef: "7e65640a-39af-4e64-bcca-81c7733aca4f"
+    partyRole: "CounterParty"
+  }
+  tradeParties {
+    validTimeFrom {
+      seconds: 1505151966
+      nanos: 337000000
+    }
+    validTimeTo {
+      seconds: 253402300799
+      nanos: 999999999
+    }
+    partyRef: "d1d974d0-826a-4e1d-9949-c10082f53f43"
+    partyRole: "CounterParty"
+  }
+  equityLegs {
+    validTimeFrom {
+      seconds: 1505151966
+      nanos: 337000000
+    }
+    validTimeTo {
+      seconds: 253402300799
+      nanos: 999999999
+    }
+    legNumber: 1
+    legType: "equities"
+    book: "290457"
+    internalProductType: "IRS31"
+    internalProductRef: "JPQGJ-0687567563"
+    instrumentId: "GXSW.H"
+    ric: "RIC-OKTIJUIUVPLR"
+    isin: "ISIN-LTCSMMSXP"
+    currency: "USD"
+    exchange: "CME"
+    buySellInd: "B"
+    cfiCode: "GMQNMNTUUS"
+    quantity: 83593
+    price: 4862.28
+    grossPrice: 4.06452544E8
+  }
+  equityLegs {
+    validTimeFrom {
+      seconds: 1505151966
+      nanos: 337000000
+    }
+    validTimeTo {
+      seconds: 253402300799
+      nanos: 999999999
+    }
+    legNumber: 2
+    legType: "equities"
+    book: "290556"
+    internalProductType: "IRS04"
+    internalProductRef: "FLCLO-7613632713"
+    instrumentId: "RSSE.T"
+    ric: "RIC-AMGWGSQFYHLP"
+    isin: "ISIN-JTCCYWADJ"
+    currency: "GBP"
+    exchange: "TTW"
+    buySellInd: "B"
+    cfiCode: "BVSEUIMYBU"
+    quantity: 73688
+    price: 2723.78
+    grossPrice: 2.00709904E8
+  }
+}
+createdBy: "mattandr"
+
+Caused by: com.google.cloud.spanner.SpannerException: ALREADY_EXISTS: io.grpc.StatusRuntimeException: ALREADY_EXISTS:
+Unique index violation on index searchByOSTradeID at index key [5251672282146295608,8996465878929457539].
+ It conflicts with row [8996465878929457539] in table TRADE.
+
+
+
+from pod log file:
+root@sit-xa-tradecore-store-1117766145-718sw:/tmp# grep 5251672282146295608 traderepository.log
+431555 [pool-1-thread-1] INFO  c.m.f.o.t.s.s.TradeCoreStoreService - insertTrade 5251672282146295608: tradeDate: 1505151892000
+osTradeId: "5251672282146295608"
+431555 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.s.DataAccessService - Inserting trade Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:45:00.641000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:45:00.641000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:45:00.641000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+431562 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.m.TradeMutation - upsert entered for table TRADE with Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:45:00.641000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=2017-09-11T17:45:00.656000000Z', transactionTimeTo=9999-12-31T23:59:59.999999999Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:45:00.641000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:45:00.641000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+
+466141 [pool-1-thread-2] INFO  c.m.f.o.t.s.s.TradeCoreStoreService - insertTrade 5251672282146295608: tradeDate: 1505151892000
+osTradeId: "5251672282146295608"
+466141 [pool-1-thread-2] INFO  c.m.f.o.t.s.d.a.s.DataAccessService - Inserting trade Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:45:35.234000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:45:35.234000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:45:35.234000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+466196 [pool-1-thread-2] INFO  c.m.f.o.t.s.d.a.m.TradeMutation - upsert entered for table TRADE with Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:45:35.234000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=2017-09-11T17:45:35.290000000Z', transactionTimeTo=9999-12-31T23:59:59.999999999Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:45:35.234000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:45:35.234000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+
+497245 [pool-1-thread-1] INFO  c.m.f.o.t.s.s.TradeCoreStoreService - insertTrade 5251672282146295608: tradeDate: 1505151892000
+osTradeId: "5251672282146295608"
+497245 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.s.DataAccessService - Inserting trade Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+497293 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.m.TradeMutation - upsert entered for table TRADE with Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=2017-09-11T17:46:06.387000000Z', transactionTimeTo=9999-12-31T23:59:59.999999999Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:06.337000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+
+498520 [pool-1-thread-1] INFO  c.m.f.o.t.s.s.TradeCoreStoreService - insertTrade 5251672282146295608: tradeDate: 1505151892000
+osTradeId: "5251672282146295608"
+498521 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.s.DataAccessService - Inserting trade Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:46:07.613000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:07.613000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:07.613000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+498524 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.m.TradeMutation - upsert entered for table TRADE with Trade{tradeId=, tradeDate=Mon Sep 11 17:44:52 UTC 2017, assetClass='equities', productType='cash-equities', origSystem='TradeCoreSelfGen5', osTradeId='5251672282146295608', tradeEventList=[TradeEvent{tradeId=, validTimeFrom=2017-09-11T17:46:07.613000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=2017-09-11T17:46:07.618000000Z', transactionTimeTo=9999-12-31T23:59:59.999999999Z', parentTradeId=, eventType='CREATE', eventStatus='DONE', eventReference='6019f2b2-eb48-45bf-b679-f82071333fb4', eventRemarks='', noOfLegs=2, osVersion='1', osVersionStatus='NEW', orderId='6677a54b-7190-4e38-b9be-9ea2abf72da5', exchangeExecutionId='EE-JQDSXVYUH-44821354', trader='Madhav', salesman='John', traderCountry='ITA', salesmanCountry='UK', tradeLegList=[Equity{tradeId='', legNumber=1, legType=equities, book='290457', internalProductType='IRS31', internalProductRef='JPQGJ-0687567563', instrumentId='GXSW.H', ric='RIC-OKTIJUIUVPLR', isin='ISIN-LTCSMMSXP', currency='USD', exchange='CME', cfiCode='GMQNMNTUUS', quantity=83593, price=4862.28, grossPrice=4.06452544E8, buySellInd='B'}, Equity{tradeId='', legNumber=2, legType=equities, book='290556', internalProductType='IRS04', internalProductRef='FLCLO-7613632713', instrumentId='RSSE.T', ric='RIC-AMGWGSQFYHLP', isin='ISIN-JTCCYWADJ', currency='GBP', exchange='TTW', cfiCode='BVSEUIMYBU', quantity=73688, price=2723.78, grossPrice=2.00709904E8, buySellInd='B'}], tradePartyList=[TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:07.613000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='7e65640a-39af-4e64-bcca-81c7733aca4f', partyRole='CounterParty'}, TradeParty{tradeId=, validTimeFrom=2017-09-11T17:46:07.613000000Z', validTimeTo=9999-12-31T23:59:59.999999999Z', transactionTimeFrom=1970-01-01T00:00:00Z', transactionTimeTo=1970-01-01T00:00:00Z', partyRef='d1d974d0-826a-4e1d-9949-c10082f53f43', partyRole='CounterParty'}], createdBy='', activeFlag='false', lockedFlag='false'}], createdTimeStamp=2017-09-11T17:44:52.771000000Z, createdBy='mattandr'}
+
+
+
+---------------------------------------------------------
+
+18:16:03.457 [pool-16-thread-2] INFO  c.m.f.o.t.l.s.PullLifeLoaderPubSubService - Received message Id: 147042052233941
+18:16:03.458 [pool-16-thread-2] INFO  c.m.f.o.t.l.p.GrpcSpannerServiceProcessor - Save trade 1515735399970786204 to grpc service
+18:16:03.458 [pool-16-thread-2] INFO  c.m.f.o.t.l.p.GrpcSpannerServiceProcessor - run transition ok
+18:16:03.520 [pool-16-thread-2] INFO  c.m.f.o.t.l.p.GrpcSpannerServiceProcessor - Save trade to grpc service finish:OperationCREATE TradeId6689664914758191613 Productcash-equities
+
+18:16:05.518 [pool-16-thread-2] INFO  c.m.f.o.t.l.s.PullLifeLoaderPubSubService - Received message Id: 147042052233941
+18:16:05.519 [pool-16-thread-2] INFO  c.m.f.o.t.l.p.GrpcSpannerServiceProcessor - Save trade 1515735399970786204 to grpc service
+18:16:05.519 [pool-16-thread-2] INFO  c.m.f.o.t.l.p.GrpcSpannerServiceProcessor - run transition ok
+
+18:16:05.547 [pool-16-thread-2] ERROR c.m.f.o.t.l.p.GrpcSpannerServiceProcessor - Failed to process ALREADY_EXISTS: Unique index violation on index searchByOSTradeID at index key [1515735399970786204,6689664914758191613]. It conflicts with row [6689664914758191613] in table TRADE.
+
+---------------------------------------------------------
+1. sent 200,000 messages
+2. started perf-dupes pod, it received all 200,000, no duplicates
+3. stopped the pod
+4. started SImpleMain on laptop.
+5. sent 3x100 more messages
+6. SimpleMain received 209551 messages! = 200,000 of those that were processed by the pod, 300 new and 109251 duplicates!
+
+logs from the pod:
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078492965692, pubTime: 2017-09-12T07:55:51.599000000Z, total: 49391, dupes: 0
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078282249799, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49392, dupes: 0
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077662110360, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49393, dupes: 0
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078217486384, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49394, dupes: 0
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078067086832, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49395, dupes: 0
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077112149826, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49396, dupes: 0
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077076418393, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49397, dupes: 0
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078570362202, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49398, dupes: 0
+08:00:47.644 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078073886978, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49399, dupes: 0
+08:00:47.645 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078570362201, pubTime: 2017-09-12T07:55:51.554000000Z, total: 49400, dupes: 0
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$ kc logs perf-dupes --tail 10
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077923403715, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70398, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077897397174, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70399, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077775532521, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70400, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078579215287, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70401, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077245924753, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70402, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077626961894, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70403, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078302776403, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70404, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078217731538, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70405, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078240989236, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70406, dupes: 0
+08:01:07.447 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077152883077, pubTime: 2017-09-12T07:55:57.480000000Z, total: 70407, dupes: 0
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$ kc logs perf-dupes --tail 10
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076785812966, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95798, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077743416895, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95799, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076887962521, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95800, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078849557057, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95801, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076490023624, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95802, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078217500198, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95803, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078429187749, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95804, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076785812967, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95805, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078707944556, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95806, dupes: 0
+08:01:31.603 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077667643321, pubTime: 2017-09-12T07:56:04.295000000Z, total: 95807, dupes: 0
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$ kc logs perf-dupes --tail 10
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077392842204, pubTime: 2017-09-12T07:59:36.913000000Z, total: 112230, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078017900118, pubTime: 2017-09-12T07:59:36.913000000Z, total: 112231, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077785881028, pubTime: 2017-09-12T07:59:36.913000000Z, total: 112232, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078225335982, pubTime: 2017-09-12T07:59:36.910000000Z, total: 112233, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078160763321, pubTime: 2017-09-12T07:59:36.910000000Z, total: 112234, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079064691357, pubTime: 2017-09-12T07:59:36.910000000Z, total: 112235, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077606470503, pubTime: 2017-09-12T07:59:36.910000000Z, total: 112236, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077634872852, pubTime: 2017-09-12T07:59:36.910000000Z, total: 112237, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078191052694, pubTime: 2017-09-12T07:59:36.910000000Z, total: 112238, dupes: 0
+08:01:47.534 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078192543728, pubTime: 2017-09-12T07:59:36.910000000Z, total: 112239, dupes: 0
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$ kc logs perf-dupes --tail 10
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077742041292, pubTime: 2017-09-12T07:59:40.863000000Z, total: 124951, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078308414807, pubTime: 2017-09-12T07:59:40.863000000Z, total: 124952, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077606472254, pubTime: 2017-09-12T07:59:40.863000000Z, total: 124953, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077686716047, pubTime: 2017-09-12T07:59:40.863000000Z, total: 124954, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077634874609, pubTime: 2017-09-12T07:59:40.863000000Z, total: 124955, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078126051932, pubTime: 2017-09-12T07:59:40.835000000Z, total: 124956, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078082427981, pubTime: 2017-09-12T07:59:40.835000000Z, total: 124957, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078408710886, pubTime: 2017-09-12T07:59:40.835000000Z, total: 124958, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077966458679, pubTime: 2017-09-12T07:59:40.835000000Z, total: 124959, dupes: 0
+08:01:58.046 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077856720463, pubTime: 2017-09-12T07:59:40.835000000Z, total: 124960, dupes: 0
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$ kc logs perf-dupes --tail 10
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078493109625, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141300, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079151575570, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141301, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078481151119, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141302, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078735326400, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141303, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078570525772, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141304, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078711100261, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141305, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078009170789, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141306, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078420317460, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141307, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077249286789, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141308, dupes: 0
+08:02:12.792 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079171954732, pubTime: 2017-09-12T07:59:45.665000000Z, total: 141309, dupes: 0
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$
+macbook:tradecore-dlt roman$ kc logs perf-dupes --tail 10
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078088224110, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158181, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077392851685, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158182, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077962780398, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158183, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079151580275, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158184, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077397933977, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158185, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078522493381, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158186, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078140917970, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158187, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078505422170, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158188, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078337729778, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158189, dupes: 0
+08:02:27.976 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077112270690, pubTime: 2017-09-12T07:59:50.538000000Z, total: 158190, dupes: 0
+
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078597405596, pubTime: 2017-09-12T07:59:56.470000000Z, total: 180736, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077785890583, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180737, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078588811249, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180738, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077448063252, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180739, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077897092615, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180740, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077392855653, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180741, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078269599239, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180742, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078423717492, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180743, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078400207207, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180744, dupes: 0
+08:02:52.395 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077144741702, pubTime: 2017-09-12T07:59:56.481000000Z, total: 180745, dupes: 0
+
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078506532221, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189674, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078331145813, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189675, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078505431464, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189676, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077180576185, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189677, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078184310070, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189678, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078005988634, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189679, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078308996203, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189680, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077748737898, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189681, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078308426935, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189682, dupes: 0
+08:03:02.217 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078228518969, pubTime: 2017-09-12T07:59:59.023000000Z, total: 189683, dupes: 0
+
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078076543847, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199991, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077160881182, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199992, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077856349892, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199993, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078160780371, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199994, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078184313008, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199995, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077968084346, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199996, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076795441252, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199997, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076986571278, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199998, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077628411078, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199999, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076490133537, pubTime: 2017-09-12T08:00:02.740000000Z, total: 200000, dupes: 0
+
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078076543847, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199991, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077160881182, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199992, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077856349892, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199993, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078160780371, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199994, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078184313008, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199995, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077968084346, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199996, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076795441252, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199997, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076986571278, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199998, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077628411078, pubTime: 2017-09-12T08:00:02.740000000Z, total: 199999, dupes: 0
+08:03:11.892 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147076490133537, pubTime: 2017-09-12T08:00:02.740000000Z, total: 200000, dupes: 0
+
+
+log from the laptop:
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078727012727, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209535, dupes: 109235, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078752243063, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209536, dupes: 109236, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078863129560, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209537, dupes: 109237, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079299264612, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209538, dupes: 109238, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079082557029, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209539, dupes: 109239, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078684907122, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209540, dupes: 109240, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078597843435, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209541, dupes: 109241, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078859974049, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209542, dupes: 109242, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079150860459, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209543, dupes: 109243, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079182241109, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209544, dupes: 109244, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077834440954, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209545, dupes: 109245, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079347203728, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209546, dupes: 109246, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079673062200, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209547, dupes: 109247, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078148883147, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209548, dupes: 109248, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147078574836698, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209549, dupes: 109249, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147079187126598, pubTime: 2017-09-12T08:07:20.746000000Z, total: 209550, dupes: 109250, ==== DUPE ====
+09:08:53.805 [pool-3-thread-1] INFO  foods.dlt.pubsub.SimpleSubscriber - Message Id: 147077835862140, pubTime: 2017-09-12T08:07:20.746000000Z, total: unT, dupes: 109251, ==== DUPE ====
+
+---------------------------------------------------------
+12:30:56.496 [pool-1-thread-1] INFO  c.m.f.o.t.s.s.TradeCoreStoreService - insertTrade 3091789739226647021: tradeDate: 1505219455000
+12:30:56.795 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.s.DataAccessService - Inserting trade Trade{tradeId=, tradeDate=Tue Sep 12 12:30:55 UTC 2017, assetClass='equities', productType='cash-equities', origSystem
+12:30:58.295 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.m.TradeMutation - upsert entered for table TRADE with Trade{tradeId=, tradeDate=Tue Sep 12 12:30:55 UTC 2017, assetClass='equities', productType='cash-equit
+12:30:58.399 [pool-1-thread-1] INFO  c.m.f.o.t.s.d.a.m.TradeMutation - upsert entered for table TRADE_EVENT with TradeEvent{tradeId=4614999344754738889, validTimeFrom=2017-09-12T12:30:55.823000000Z', validTime
+
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+

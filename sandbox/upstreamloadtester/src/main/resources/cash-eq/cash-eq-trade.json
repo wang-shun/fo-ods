@@ -1,0 +1,115 @@
+{
+  "outputType": "hashmap",
+  "outputDest": "",
+  "attributes": [
+    {
+      "name": "sequenceNumber",
+      "type": "sequence"
+    },
+    {
+      "name": "exchangeExecutionId",
+      "type": "string",
+      "format": "FE-e-343"
+    },
+    {
+      "name": "emsOrderId",
+      "type": "string",
+      "value": "LNNBABK6PF000"
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "value": "1"
+    },
+    {
+      "name": "side",
+      "type": "string",
+      "format": "1"
+    },
+    {
+      "name": "assetClass",
+      "type": "string",
+      "value": "EQ"
+    },
+    {
+      "name": "symbol",
+      "type": "string",
+      "values": "GOOG.L,APP.L"
+    },
+    {
+      "name": "cfiCode",
+      "type": "string",
+      "value": "ES"
+    },
+    {
+      "name": "executionTime",
+      "type": "longdate"
+    },
+    {
+      "name": "executionType",
+      "type": "string",
+      "value": "1"
+    },
+    {
+      "name": "quantityFilled",
+      "type": "int",
+      "minRange": "1",
+      "maxRange": "1000"
+    },
+    {
+      "name": "market",
+      "type": "string",
+      "values": "FEX,LSE,CME"
+    },
+    {
+      "name": "username",
+      "type": "string",
+      "values": "mattandr,bondjames,caprleo"
+    },
+    {
+      "name": "sophisFolioId",
+      "type": "string",
+      "values": "290455,290456,290457,290458,290459,290555,290556,290557,290660"
+    },
+    {
+      "name": "sophisEntityId",
+      "type": "string",
+      "values": "AAA,BBB,CCC,DDD,EEE,FFF,GGG,HHH,III,JJJ,KKK,LLL,MMM"
+    },
+    {
+      "name": "sophisCouterpartyId",
+      "type": "string",
+      "values": "ZZZ,YYY,XXX,WWW,VVV,UUU,TTT,SSS,RRR,QQQ,PPP,OOO,NNN"
+    },
+    {
+      "name": "price",
+      "type": "float",
+      "minRange": "1",
+      "maxRange": "5000"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "values": "GBX,EUR,HKD,USD"
+    },
+    {
+      "name": "bookingStatus",
+      "type": "string",
+      "values": "U,C"
+    },
+    {
+      "name": "bookingId",
+      "type": "uuid"
+    },
+    {
+      "name": "amount",
+      "type": "multiply",
+      "formula": "price*quantityFilled"
+    },
+    {
+      "name": "tradeDate",
+      "type": "date",
+      "format": "dd-MMM-yyyy"
+    }
+  ]
+}

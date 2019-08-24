@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fo-ods-tradecore-loadgen
+  labels:
+    app: fo-ods-tradecore-loadgen
+# For more info about Pods see:
+#   https://cloud.google.com/container-engine/docs/pods/
+spec:
+  containers:
+  - name: tradecore-ulg
+    image: gcr.io/fo-ods/fo-ods-tradecore-loadgen
+    resources:
+      requests:
+        memory: "300Mi"
+        cpu: "200m"
+      limits:
+        memory: "500Mi"
+        cpu: "500m"
+    args: ["java", "-cp", "tradecore-0.2.0-SNAPSHOT.jar", "com.maplequad.fo.ods.tradecore.store.app.TradeCoreApp", "cash-eq", "100000", "5000"]
+    env:
+    - name: JAVA_HEAP_OPTS
+      value: "-Xmx500m -Xms200m"
+    - name: JAVA_USER_OPTS
+      value: "-XX:+PrintFlagsFinal"
+      #value: "-XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+    # This setting makes nodes pull the docker image every time before starting the pod.
+    # This is useful when debugging, but should be turned off in production.
+    imagePullPolicy: Always
+  restartPolicy: Never

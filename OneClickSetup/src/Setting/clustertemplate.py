@@ -1,0 +1,33 @@
+
+
+cluster_request_template = {
+    'initialNodeCount':3,
+    'legacyAbac': {'enabled': True},
+    'loggingService': 'logging.googleapis.com',
+    'network': 'default',
+    'nodeConfig': {'diskSizeGb': 100,
+                   'imageType': 'COS',
+                   'machineType': 'n1-standard-1',
+                   'oauthScopes': ['https://www.googleapis.com/auth/bigquery',
+                                   'https://www.googleapis.com/auth/bigtable.admin',
+                                   'https://www.googleapis.com/auth/bigtable.data',
+                                   'https://www.googleapis.com/auth/cloud-platform',
+                                   'https://www.googleapis.com/auth/compute',
+                                   'https://www.googleapis.com/auth/datastore',
+                                   'https://www.googleapis.com/auth/devstorage.full_control',
+                                   'https://www.googleapis.com/auth/devstorage.read_only',
+                                   'https://www.googleapis.com/auth/logging.admin',
+                                   'https://www.googleapis.com/auth/monitoring',
+                                   'https://www.googleapis.com/auth/pubsub',
+                                   'https://www.googleapis.com/auth/service.management',
+                                   'https://www.googleapis.com/auth/service.management.readonly',
+                                   'https://www.googleapis.com/auth/servicecontrol',
+                                   'https://www.googleapis.com/auth/sqlservice.admin',
+                                   'https://www.googleapis.com/auth/taskqueue',
+                                   'https://www.googleapis.com/auth/trace.append',
+                                   'https://www.googleapis.com/auth/userinfo.email',
+                                   'https://www.googleapis.com/auth/logging.write'],
+                   'serviceAccount': 'default'},
+    'masterAuth': {'username': 'admin'},
+    'monitoringService': 'monitoring.googleapis.com'
+}

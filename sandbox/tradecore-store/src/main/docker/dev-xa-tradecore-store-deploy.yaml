@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: dev-xa-tradecore-store
+  labels:
+    app: dev-xa-tradecore-store
+
+spec:
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: dev-xa-tradecore-store
+    spec:
+      containers:
+      - name:  dev-xa-tradecore-store-test-client
+        image: gcr.io/fo-ods/tradecore-store-api
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        ports:
+        - name: grpc
+          containerPort: 5555
+        env:
+        - name: TC_STORE_SRVC_PORT
+          value: "5555"
+        - name: NO_OF_THREADS
+          value: "2"
+        - name: INSTANCE_ID
+          value: "tradecore"
+        - name: DATABASE
+          value: "only-for-bulk-amend-test"
+        - name: JAVA_HEAP_OPTS
+          value: "-Xmx500m -Xms200m"
+        - name: JAVA_USER_OPTS
+          value: "-XX:+PrintFlagsFinal"

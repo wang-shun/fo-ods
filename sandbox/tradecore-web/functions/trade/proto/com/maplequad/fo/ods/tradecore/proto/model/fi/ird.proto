@@ -1,0 +1,43 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model.fi;
+
+import "../../google/protobuf/timestamp.proto";
+
+//Interest Rate Derivative
+message IRD {
+
+    //Primary Key
+    string tradeId = 1;
+    google.protobuf.Timestamp validTimeFrom = 2;
+    google.protobuf.Timestamp validTimeTo = 3;
+    google.protobuf.Timestamp transactionTimeFrom = 4;
+    google.protobuf.Timestamp transactionTimeTo = 5;
+    int64 legNumber = 6;
+
+    //Common Attributes
+    string legType = 7;
+    string book = 8;
+    string internalProductType = 9;
+    string internalProductRef = 10;
+    string instrumentId = 11;
+    string ric = 12;
+    string isin = 13;
+    string currency = 14;
+    string exchange = 15;
+    string buySellInd = 16;
+
+    //Interest Rate Derivatives Attributes
+    string irdLegType = 17;
+    int64 maturityDate = 18;
+    float notional = 19;
+    string index = 20;
+    string notionalExp = 21;
+    string term = 22;
+    float rate = 23;
+    string basis = 24;
+    float spread = 25;
+    string settlementCcy = 26;
+    float settlementAmount = 27;
+    int64 settlementDate = 28;
+
+    }

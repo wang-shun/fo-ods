@@ -1,0 +1,10 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model.event;
+
+//BulkAmendTask
+message BulkAmendTask {
+    string bulkAmendId = 1;
+    string tradeId = 2;
+    string action = 3;
+    string metaData = 4;
+}

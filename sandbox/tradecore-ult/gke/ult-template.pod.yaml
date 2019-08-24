@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ult-$VARIANT
+  labels:
+    app: ult-$VARIANT
+
+spec:
+  containers:
+  - name: ult
+    image: gcr.io/fo-ods/tradecore-ult:$TAG
+    resources:
+      requests:
+        memory: "200Mi"
+        cpu: "200m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+    args: ["java", "-cp", "app.jar", "foods.ult.pubsub.UltMain",
+           "$TRADE_COUNT", "$TRADE_TYPE", "$LEGS_COUNT", "2", "$TOPIC", "5000", "10", "0"]
+    env:
+    - name: JAVA_HEAP_OPTS
+      value: "-Xmx1g -Xms200m"
+    imagePullPolicy: Always
+  restartPolicy: Never

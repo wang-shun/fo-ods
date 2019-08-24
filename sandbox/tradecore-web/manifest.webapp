@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "name": "TradeCoreWeb",
+  "launch_path": "static/index.html",
+  "description": "TradeCore on Web",
+  "developer": {
+    "name": "MapleQuad TradeCore",
+    "url": "https://tradecore-web.firebaseio.com/"
+  },
+  "installs_allowed_from": [
+    "*"
+  ],
+  "default_locale": "en",
+  "permissions": {
+  },
+  "locales": {
+    "en": {
+      "name": "TradeCoreWeb",
+      "description": "TradeCore on Web"
+    }
+  }
+}

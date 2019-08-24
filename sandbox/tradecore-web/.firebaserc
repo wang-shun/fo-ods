@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "fo-ods",
+    "uat": "fo-ods",
+    "sit": "maplequad-tradecore"
+  }
+}

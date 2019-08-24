@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: uat-xa-tradecore-store
+  labels:
+    app: uat-xa-tradecore-store
+
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 3002
+    targetPort: grpc
+  selector:
+    app: uat-xa-tradecore-store
+

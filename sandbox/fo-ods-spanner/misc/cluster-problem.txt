@@ -1,0 +1,97 @@
+
+macbook:fo-ods-spanner roman$ kubectl get nodes
+NAME                                             STATUS    AGE       VERSION
+gke-cluster-spanner-default-pool-67e21217-0q25   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-1tvd   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-3kjj   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-4148   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-4nvr   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-5fgt   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-6002   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-7022   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-72r3   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-cfnq   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-djgg   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-gk2l   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-hvvl   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-kd98   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-khcd   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-kr0w   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-nchn   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-njss   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-p8xd   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-q9m6   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-qcks   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-qwn6   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-rbd3   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-spj1   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-t5vh   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-v8vw   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-z12t   Ready     7d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-z3t7   Ready     2d        v1.7.2
+gke-cluster-spanner-default-pool-67e21217-zcmg   Ready     22h       v1.7.2
+gke-cluster-spanner-default-pool-67e21217-zfql   Ready     2d        v1.7.2
+
+
+macbook:fo-ods-spanner roman$ kubectl get jobs
+NAME            DESIRED   SUCCESSFUL   AGE
+querybypk-job   20        20           2d
+spanner-job     40        40           22h
+
+
+macbook:fo-ods-spanner roman$ kubectl get services
+NAME         CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+kubernetes   10.55.240.1   <none>        443/TCP   7d
+
+
+macbook:fo-ods-spanner roman$ kubectl describe job spanner-job
+Name:		spanner-job
+Namespace:	default
+Selector:	controller-uid=d0dec7b3-81d6-11e7-aef2-42010a84002b
+Labels:		app=spanner-job
+Annotations:	<none>
+Parallelism:	40
+Completions:	40
+Start Time:	Tue, 15 Aug 2017 17:28:48 +0100
+Pods Statuses:	0 Running / 40 Succeeded / 12469 Failed
+Pod Template:
+  Labels:	controller-uid=d0dec7b3-81d6-11e7-aef2-42010a84002b
+		job-name=spanner-job
+  Containers:
+   spanner:
+    Image:	gcr.io/fo-ods/spanner:v3
+    Port:	<none>
+    Args:
+      java
+      -cp
+      app.jar
+      spanner.SimpleMain
+      spanner-test
+      tradeslegs
+      trades4
+      50000
+      2
+      2
+    Limits:
+      cpu:	500m
+      memory:	500Mi
+    Requests:
+      cpu:	200m
+      memory:	300Mi
+    Environment:
+      JAVA_HEAP_OPTS:	-Xmx400m -Xms200m
+      JAVA_USER_OPTS:	-XX:+PrintFlagsFinal
+    Mounts:		<none>
+  Volumes:		<none>
+Events:			<none>
+
+
+macbook:fo-ods-spanner roman$ kubectl get pods
+unexpected end of JSON input
+
+macbook:fo-ods-spanner roman$ kubectl version
+Client Version: version.Info{Major:"1", Minor:"7", GitVersion:"v1.7.0", GitCommit:"d3ada0119e776222f11ec7945e6d860061339aad", GitTreeState:"clean", BuildDate:"2017-06-29T23:15:59Z", GoVersion:"go1.8.3", Compiler:"gc", Platform:"darwin/amd64"}
+Server Version: version.Info{Major:"1", Minor:"7", GitVersion:"v1.7.3", GitCommit:"2c2fe6e8278a5db2d15a013987b53968c743f2a1", GitTreeState:"clean", BuildDate:"2017-08-03T06:43:48Z", GoVersion:"go1.8.3", Compiler:"gc", Platform:"linux/amd64"}
+
+macbook:fo-ods-spanner roman$ kubectl config current-context
+gke_fo-ods_europe-west1-c_cluster-spanner

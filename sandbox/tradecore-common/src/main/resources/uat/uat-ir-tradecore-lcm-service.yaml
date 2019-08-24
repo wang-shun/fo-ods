@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: uat-ir-tradecore-lcm
+  labels:
+    app: uat-ir-tradecore-lcm
+
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 3000
+    targetPort: grpc
+  selector:
+    app: uat-ir-tradecore-lcm

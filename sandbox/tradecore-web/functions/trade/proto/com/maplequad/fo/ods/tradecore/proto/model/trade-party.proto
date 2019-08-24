@@ -1,0 +1,20 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model;
+
+import "../google/protobuf/timestamp.proto";
+
+//TradeParty
+message TradeParty {
+
+    //Primary Key
+    string tradeId = 1;
+    google.protobuf.Timestamp validTimeFrom = 2;
+    google.protobuf.Timestamp validTimeTo = 3;
+    google.protobuf.Timestamp transactionTimeFrom = 4;
+    google.protobuf.Timestamp transactionTimeTo = 5;
+    string partyRef = 6;
+
+    //Attributes
+    string partyRole = 7;
+
+}

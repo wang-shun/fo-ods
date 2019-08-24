@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Interest Rate Swap Trade Booking Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Loading Bootstrap -->
+    <link href="flat-ui/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="flat-ui/css/flat-ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/trade-order.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/vendor/html5shiv.js"></script>
+      <script src="js/vendor/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<!--div class="container palette-midnight-blue whiteFont"-->
+<div class="container orderPanel">
+    <form class="form" action="/createIrsTrade" method="post" name="createTradeForm" id="createTradeForm">
+    <input id="hdnTenor" name="hdnTenor" type="hidden" value="" />
+    <input name="hdnExchange" id="hdnExchange" type="hidden" value="" />
+    <input name="hdnUserName" id="hdnUserName" type="hidden" value="" />
+    <div class="row">
+        <div class="col-md-6 palette-pomegranate"><span class="fui-new"></span>&nbsp;&nbsp;New Trade</div>
+        <div class="col-md-4 palette-pomegranate"><span class="fui-eye"></span>&nbsp;&nbsp;Algo Type: None</span></div>
+        <div class="col-md-2 palette-pomegranate" style="text-align:right"><span class="fui-triangle-down"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fui-gear"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:window.close();"></a><span class="fui-exit"></span></div>
+
+        <div class="col-xs-12" style="height:20px"></div>
+        <!-- row starts -->
+        <div class="col-md-1">Start</div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtStartDate" name="txtStartDate" onfocusout="fnSetStartDate()"></div>
+        <div class="col-md-1"></div>
+        <div class="col-md-2"></div>
+        <div class="col-md-1">End</div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtEndDate" name="txtEndDate" onfocusout="fnCalcEndDate()"></div>
+        <div class="col-md-1"></div>
+        <div class="col-md-2"></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-md-6" style="color:crimson; font-size: 1.1em; font-weight: bold;">Pay</div>
+        <div class="col-md-6" style="color:green; font-size: 1.1em; font-weight: bold;">Receive</div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-md-1">Currency</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboPayLegCcy" name="cboPayLegCcy">
+                <option value="USD" selected>USD</option>
+                <option value="GBP">GBP</option>
+                <option value="EUR">EUR</option>
+                <option value="JPY">JPN</option>
+                <option value="HKD">HKD</option>
+            </select>
+        </div>
+        <div class="col-md-1">Notional</div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtPayLegNotional" name="txtPayLegNotional" onfocusout="fnCalcAmount('PayLegNotional')"></div>
+
+        <div class="col-md-1">Currency</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboRecLegCcy" name="cboRecLegCcy">
+                <option value="USD" selected>USD</option>
+                <option value="GBP">GBP</option>
+                <option value="EUR">EUR</option>
+                <option value="JPY">JPN</option>
+                <option value="HKD">HKD</option>
+            </select>
+        </div>
+        <div class="col-md-1">Notional</div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtRecLegNotional" name="txtRecLegNotional" onfocusout="fnCalcAmount('RecLegNotional')"></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-md-1">Index</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboPayLegIdx" name="cboPayLegIdx">
+                <option value="LIBOR" selected>LIBOR</option>
+                <option value="EURIB">EURIB</option>
+            </select>
+        </div>
+        <div class="col-md-1">Ntl Exp</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboPayLegNtlExp" name="cboPayLegNtlExp">
+                <option value="None" selected>None</option>
+                <option value="Units">Units</option>
+                <option value="CCy">Ccy</option>
+            </select>
+        </div>
+
+        <div class="col-md-1">Index</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboRecLegIdx" name="cboRecLegIdx">
+                <option value="LIBOR" selected>LIBOR</option>
+                <option value="EURIB">EURIB</option>
+            </select>
+        </div>
+        <div class="col-md-1">Ntl Exp</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboRecLegNtlExp" name="cboRecLegNtlExp">
+                <option value="None" selected>None</option>
+                <option value="Units">Units</option>
+                <option value="CCy">Ccy</option>
+            </select>
+        </div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-md-1">Term</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboPayLegTerm" name="cboPayLegTerm">
+                <option value="1W">1W</option>
+                <option value="1M">1M</option>
+                <option value="3M" selected>3M</option>
+                <option value="6M">6M</option>
+                <option value="12M">12M</option>
+            </select>
+        </div>
+        <div class="col-md-1">Rate</div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtPayLegRate" name="txtPayLegRate"></div>
+
+        <div class="col-md-1">Term</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboRecLegTerm" name="cboRecLegTerm">
+                <option value="1W">1W</option>
+                <option value="1M">1M</option>
+                <option value="3M" selected>3M</option>
+                <option value="6M">6M</option>
+                <option value="12M">12M</option>
+            </select>
+        </div>
+        <div class="col-md-1">Rate</div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtRecLegRate" name="txtRecLegRate"></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-md-1">Basis</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboPayLegBasis" name="cboPayLegBasis">
+                <option value="None">None</option>
+                <option value="A360" selected>A360</option>
+                <option value="A365Fixed">A365 Fixed</option>
+                <option value="30/360">30/360</option>
+                <option value="30/360E">30/360E</option>
+                <option value="Actual">Actual</option>
+                <option value="D360">D360</option>
+                <option value="D365">D365</option>
+                <option value="Coupon">Coupon</option>
+                <option value="Price">Price</option>
+                <option value="Perf">Perf</option>
+            </select>
+        </div>
+        <div class="col-md-1">Spread</div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtPayLegSpread" name="txtPayLegSpread"></div>
+
+        <div class="col-md-1">Basis</div>
+        <div class="col-md-2">
+            <select class="form-control select select-inverse" data-toggle="select" id="cboRecLegBasis" name="cboRecLegBasis">
+                <option value="None">None</option>
+                <option value="A360" selected>A360</option>
+                <option value="A365Fixed">A365 Fixed</option>
+                <option value="30/360">30/360</option>
+                <option value="30/360E">30/360E</option>
+                <option value="Actual">Actual</option>
+                <option value="D360">D360</option>
+                <option value="D365">D365</option>
+                <option value="Coupon">Coupon</option>
+                <option value="Price">Price</option>
+                <option value="Perf">Perf</option>
+            </select>
+        </div>
+        <div class="col-md-1">Spread</div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtRecLegSpread" name="txtRecLegSpread"></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-md-2">CounterParty</div>
+        <div class="col-md-4"><input class="form-control" type="text" id="txtCounterParty" name="txtCounterParty"></div>
+        <div class="col-md-1">Broker</div>
+        <div class="col-md-3"><input class="form-control" type="text" id="txtBroker" name="txtBroker"></div>
+        <div class="col-md-2"><input type="button" class="btn btn-lg btn-danger" value="Do!" onclick="javascript:fnDoChecks();" /></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:7px"></div>
+        <!-- row starts -->
+        <div class="col-md-2">Product / Formula</div>
+        <div class="col-md-4"><input class="form-control" type="text" id="txtProduct" name="txtProduct"></div>
+        <div class="col-md-1">Desc</div>
+        <div class="col-md-3"><input class="form-control" type="text" id="txtProductDesc" name="txtProductDesc"></div>
+        <div class="col-md-2"></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>        
+        <!-- row starts -->
+        <div class="col-md-2">Clearing</div>
+        <div class="col-md-4"><input class="form-control" type="text" id="txtClearing" name="txtClearing"></div>
+        <div class="col-md-1">Book</div>
+        <div class="col-md-3"><input class="form-control" type="text" id="txtTradeBook" name="txtTradeBook"></div>
+        <div class="col-md-2"></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-xs-12" style="font-size: 1.1em; font-weight: bold;">Schedule</div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-md-1"></div>
+        <div class="col-md-1">Freq</div>
+        <div class="col-md-1">Day</div>
+        <div class="col-md-2">Roll Date</div>
+        <div class="col-md-1">Cal</div>
+        <div class="col-md-1"></div>
+        <div class="col-md-1">Freq</div>
+        <div class="col-md-1">Day</div>
+        <div class="col-md-2">Roll Date</div>
+        <div class="col-md-1">Cal</div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+        <!-- row starts -->
+        <div class="col-md-1">Pay</div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtPayPayFreq" name="txtPayPayFreq"></div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtPayPayDay" name="txtPayPayDay"></div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtPayPayRollDate" name="txtPayPayRollDate"></div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtPayPayCal" name="txtPayPayCal"></div>
+        <div class="col-md-1">Pay</div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtRecPayFreq" name="txtRecPayFreq"></div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtRecPayDay" name="txtRecPayDay"></div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtRecPayRollDate" name="txtRecPayRollDate"></div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtRecPayCal" name="txtRecPayCal"></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:30px"></div>
+        <!-- row starts -->
+        <div class="col-md-1">Reset</div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtPayResetFreq" name="txtPayResetFreq"></div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtPayResetDay" name="txtPayResetDay"></div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtPayResetRollDate" name="txtPayResetRollDate"></div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtPayResetCal" name="txtPayResetCal"></div>
+        <div class="col-md-1">Reset</div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtRecResetFreq" name="txtRecResetFreq"></div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtRecResetDay" name="txtRecResetDay"></div>
+        <div class="col-md-2"><input class="form-control" type="text" id="txtRecResetRollDate" name="txtRecResetRollDate"></div>
+        <div class="col-md-1"><input class="form-control" type="text" id="txtRecResetCal" name="txtRecResetCal"></div>
+        <!-- row ends -->
+        <div class="col-xs-12" style="height:10px"></div>
+
+        <div class="col-xs-12" style="height:10px"></div>
+        
+        <div class="col-md-6"></div>
+        <div class="col-md-3"></div>
+        <div class="col-md-3" style="text-align: right">
+                <input type="button" class="btn btn-lg btn-danger" value="Book Trade" onclick="javascript:submit();" />
+        </div>
+        <div class="col-xs-12" style="height:18px"></div>
+
+    </div>
+     </div>
+    </div>
+    </form>
+</div>
+    <!-- /.container -->
+    <!-- jQuery (necessary for Flat UI's JavaScript plugins) -->
+    <script src="flat-ui/js/vendor/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="flat-ui/js/flat-ui.min.js"></script>
+    <script src="flat-ui/js/application.js"></script>
+    <script src="scripts/irs-trade.js"></script>
+    <script>fnOnLoad();</script>
+</body>
+
+</html>

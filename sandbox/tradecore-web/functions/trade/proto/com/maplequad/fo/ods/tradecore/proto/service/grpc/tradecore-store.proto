@@ -1,0 +1,87 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.service.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.maplequad.fo.ods.tradecore.proto.service.grpc";
+option java_outer_classname = "TradeCoreStoreService";
+option objc_class_prefix = "TC";
+
+import "../../model/trade.proto";
+import "../../model/tradequery.proto";
+import "../../google/protobuf/timestamp.proto";
+import "../../model/event/bulk-amend.proto";
+import "../../service/grpc/tradecore-balcm.proto";
+
+// TradeCore CRUD API
+service TradeCoreStore {
+    // Creates New Trade(s).
+    rpc CreateTrade(CreateTradeRequest) returns (CreateTradeResponse) {}
+    // Return all trades matching the criteria.
+    rpc ReadTrade (com.maplequad.fo.ods.tradecore.proto.model.TradeQuery) returns (ReadTradeResponse) {}
+    // Update Trade(s).
+    rpc UpdateTrade(UpdateTradeRequest) returns (UpdateTradeResponse) {}
+    // Initiate Bulk Amend
+    rpc CreateBulkAmend (com.maplequad.fo.ods.tradecore.proto.model.event.BulkAmend) returns (BulkAmendId) {
+    }
+    // Execute Bulk Amend
+    rpc GetBulkAmend (BulkAmendId) returns (com.maplequad.fo.ods.tradecore.proto.model.event.BulkAmend) {
+    }
+    // Execute Bulk Amend
+    rpc ExecuteBulkAmend (BulkAmendResponse) returns (Empty) {
+    }
+    // Cancel Bulk Amend
+    rpc CancelBulkAmend (BulkAmendId) returns (Empty) {
+    }
+    // Test connection Method
+    rpc TestConnection(TestRequest) returns (TestReply) {}
+}
+
+message CreateTradeRequest{
+    com.maplequad.fo.ods.tradecore.proto.model.Trade trade = 1;
+}
+
+message CreateTradeResponse {
+    com.maplequad.fo.ods.tradecore.proto.model.Trade trade = 1;
+    google.protobuf.Timestamp dsStartTimestamp = 2;
+    google.protobuf.Timestamp dsFinishTimestamp = 3;
+}
+
+message ReadTradeRequest{
+    string tradeId = 1;
+    string assetClass = 2;
+    com.maplequad.fo.ods.tradecore.proto.model.Trade trade = 3;
+}
+
+message ReadTradeResponse {
+    repeated com.maplequad.fo.ods.tradecore.proto.model.Trade trades = 1;
+    google.protobuf.Timestamp dsStartTimestamp = 2;
+    google.protobuf.Timestamp dsFinishTimestamp = 3;
+}
+
+message UpdateTradeRequest{
+    repeated com.maplequad.fo.ods.tradecore.proto.model.Trade trades = 1;
+}
+
+message UpdateTradeResponse {
+    repeated com.maplequad.fo.ods.tradecore.proto.model.Trade trades = 1;
+    google.protobuf.Timestamp dsStartTimestamp = 2;
+    google.protobuf.Timestamp dsFinishTimestamp = 3;
+}
+
+// The request message containing the message.
+message TestRequest {
+  string name = 1;
+}
+
+// The response message containing the provided message
+message TestReply {
+  string message = 1;
+}
+
+message BulkAmendId {
+    string bulkAmendId = 1;
+}
+
+message Empty {
+
+}

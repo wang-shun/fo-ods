@@ -1,0 +1,20 @@
+<configuration debug="true">
+
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoders are assigned the type
+         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <encoder>
+        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+</appender>
+
+<logger name="org.eclipse" level="info"/>
+<logger name="io.grpc.netty.NettyClientHandler" level="info"/>
+<logger name="com.google" level="warn"/>
+<logger name="com.maplequad.fo.ods.tradecore" level="debug"/>
+<logger name="com.maplequad.fo.ods.tradecore.md" level="debug"/>
+
+<root level="info">
+    <appender-ref ref="STDOUT" />
+</root>
+</configuration>

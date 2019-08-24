@@ -1,0 +1,34 @@
+syntax = "proto3";
+package com.maplequad.fo.ods.tradecore.proto.model;
+
+import "google/protobuf/timestamp.proto";
+import "com/maplequad/fo/ods/tradecore/proto/model/trade-event.proto";
+
+//Trade
+message Trade {
+
+    //Primary Key
+    string tradeId = 1;
+
+    //Attributes
+    int64 tradeDate = 2;
+    string assetClass = 3;
+    TradeType tradeType = 10;
+    string productType = 4;
+    string origSystem = 5;
+    string osTradeId = 6;
+    google.protobuf.Timestamp createdTimeStamp = 7;
+
+    //Collections
+    repeated TradeEvent tradeEvents = 8;
+
+    //Audit Trail
+    string createdBy = 9;
+
+}
+
+enum TradeType {
+    SINGLE = 0;
+    STRUCTURED = 1;
+}
+

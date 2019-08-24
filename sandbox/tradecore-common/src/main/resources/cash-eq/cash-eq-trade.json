@@ -1,0 +1,178 @@
+{
+  "outputType": "trade",
+  "outputDest": "tradecore-store",
+  "tradeEventAttributes": [
+    {
+      "name": "sequenceNumber",
+      "type": "sequence"
+    },
+    {
+      "name": "username",
+      "type": "string",
+      "values": "mattandr,bondjames,caprleo"
+    },
+    {
+      "name": "origSystem",
+      "type": "string",
+      "format": "TradeCoreSelfGen${N,1}"
+    },
+    {
+      "name": "assetClass",
+      "type": "string",
+      "value": "eqt"
+    },
+    {
+      "name": "productType",
+      "type": "string",
+      "value": "cash-equity"
+    },
+    {
+      "name": "tradeType",
+      "type": "string",
+      "value": "SINGLE"
+    },
+    {
+      "name": "parentTradeId",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "name": "osVersion",
+      "type": "string",
+      "value": "1"
+    },
+    {
+      "name": "osVersionStatus",
+      "type": "string",
+      "value": "NEW"
+    },
+    {
+      "name": "bookingId",
+      "type": "uuid"
+    },
+    {
+      "name": "bookingStatus",
+      "type": "string",
+      "value": "NEW"
+    },
+    {
+      "name": "eventType",
+      "type": "string",
+      "value": "NEW"
+    },
+    {
+      "name": "exchangeExecutionId",
+      "type": "string",
+      "format": "EE-${S,9}-${N,8}"
+    },
+    {
+      "name": "orderId",
+      "type": "uuid"
+    },
+    {
+      "name": "trader",
+      "type": "string",
+      "values": "Madhav,Roman,Dexter"
+    },
+    {
+      "name": "traderCountry",
+      "type": "string",
+      "values": "USA,UK,IND,HKG,CHN,RUS,FRA,GER,SWI,ROM,ITA,BRA,RUS,CHI,NED"
+    },
+    {
+      "name": "salesman",
+      "type": "string",
+      "values": "Ronaldo,John,Tim,Larry,George,Mike,Lucaz,Peter,Soloman,Ben,Marry,Andrew,Ross,Leo,Tom"
+    },
+    {
+      "name": "salesmanCountry",
+      "type": "string",
+      "values": "USA,UK,IND,HKG,CHN,RUS,FRA,GER,SWI,ROM,ITA,BRA,RUS,CHI,NED"
+    },
+    {
+      "name": "tradeDate",
+      "type": "date",
+      "format": "yyyy-MM-dd"
+    }
+  ],
+  "tradeLegAttributes": [
+    {
+      "name": "legType",
+      "type": "string",
+      "value": "cash-equity"
+    },
+    {
+      "name": "ptsFolioId",
+      "type": "string",
+      "values": "290455,290456,290457,290458,290459,290555,290556,290557,290660"
+    },
+    {
+      "name": "intPrdType",
+      "type": "string",
+      "format": "IRS${N,2}"
+    },
+    {
+      "name": "intPrdRef",
+      "type": "string",
+      "format": "${S,5}-${N,9}3"
+    },
+    {
+      "name": "symbol",
+      "type": "string",
+      "values": "ABC.D,LMN.O,PQRS.T,DEFG.H,KLMP.N,LERT.F,RSSE.T,SGRL.G,KSRH.H,GXSW.H,AFTP.G,LTTP.T,VRVR.G"
+    },
+    {
+      "name": "ric",
+      "type": "string",
+      "format": "RIC-${S,12}"
+    },
+    {
+      "name": "isin",
+      "type": "string",
+      "format": "ISIN-${S,9}"
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "values": "GBP,EUR,HKD,USD,INR,RUB,CNY"
+    },
+    {
+      "name": "market",
+      "type": "string",
+      "values": "FEX,LSE,CME,GGT,GGR,ERD,GSR,TWR,TTW,WSF,PRE,TWE"
+    },
+    {
+      "name": "cfiCode",
+      "type": "string",
+      "format": "${S,10}"
+    },
+    {
+      "name": "quantityFilled",
+      "type": "int",
+      "minRange": "1",
+      "maxRange": "100000"
+    },
+    {
+      "name": "price",
+      "type": "float",
+      "minRange": "1",
+      "maxRange": "5000"
+    },
+    {
+      "name": "buySellInd",
+      "type": "string",
+      "values": "B,S"
+    }
+  ],
+  "tradePartyAttributes": [
+    {
+      "name": "partyRef",
+      "type": "uuid"
+    },
+    {
+      "name": "partyRole",
+      "type": "string",
+      "values": "OnBehalfOfParty,CounterParty,ExecutionOnly"
+    }
+  ]
+}

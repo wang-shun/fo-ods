@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+
+
+	<!-- <bean id="TradeCoreStoreService" class="com.maplequad.fo.ods.tradecore.lcm.services.TradeCoreStoreService">
+		<constructor-arg type="java.lang.String" value="35.189.219.191" /> <constructor-arg 
+		type="int" value="5555" /> </bean> -->
+	<bean id="propertyPlaceholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="searchSystemEnvironment" value="true" />
+	</bean>
+<!--
+	<bean id="TradeGeneratorServiceLegacy"
+		class="com.maplequad.fo.ods.tradecore.lcm.services.TradeGeneratorServiceLegacy">
+		<constructor-arg type="java.lang.String" value="cash-eq" />
+		<constructor-arg type="java.lang.String" value="CREATE" />
+	</bean>
+	<bean id="TradeConverterService2Pojo"
+		class="com.maplequad.fo.ods.tradecore.lcm.services.TradeConverterService2Pojo">
+	</bean>
+	-->
+
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="8" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="25" />
+	</bean>
+
+
+	<bean id="SimpleTaskHandler" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.SimpleTaskHandler">
+		<constructor-arg type="int" value="0" />
+	</bean>
+
+	<!-- simplest-->
+	<bean id="bkqueue" class="java.util.concurrent.LinkedBlockingQueue"></bean>
+
+	<!--
+	<bean id="PubSubShooter"
+		class="com.foods.lifeloader.lifeloaderdummy.MessagePublisher.PubSubShooter">
+		<constructor-arg type="java.lang.String" value="${PUBSUB_TOPIC}" />
+	</bean>-->
+
+	<bean id="PlainPublisher" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainPublisher">
+		<constructor-arg type="java.util.concurrent.BlockingQueue"
+			ref="bkqueue" />
+	</bean>
+<!--
+	<bean id="PlainConsumer" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainConsumer">
+		<constructor-arg type="java.util.concurrent.BlockingQueue"
+			ref="bkqueue" />
+		<constructor-arg type="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.SimpleTaskHandler"
+			ref="PubSubShooter" />
+		<constructor-arg ref="taskExecutor" />
+	</bean>-->
+	<!-- simplest end-->
+
+
+	<!-- FX-->
+	<bean id="fxbkqueue" class="java.util.concurrent.LinkedBlockingQueue"></bean>
+	<bean id="FXPubSubShooter"
+		  class="com.foods.lifeloader.lifeloaderdummy.Publisher.PubSubShooter">
+		<constructor-arg type="java.lang.String" value="${FX_PUBSUB_TOPIC}" />
+		<property name="publisher" ref="${MSG_PUBLISHER_NAME:PubSubPublisher}" />
+	</bean>
+
+	<bean id="FXPlainPublisher" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainPublisher">
+		<constructor-arg type="java.util.concurrent.BlockingQueue"
+						 ref="fxbkqueue" />
+	</bean>
+
+	<bean id="FXPlainConsumer" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainConsumer">
+		<constructor-arg type="java.util.concurrent.BlockingQueue"
+						 ref="fxbkqueue" />
+		<constructor-arg type="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.SimpleTaskHandler"
+						 ref="FXPubSubShooter" />
+		<constructor-arg ref="taskExecutor" />
+	</bean>
+	<!-- FX end-->
+
+
+	<!-- IR-->
+	<bean id="irbkqueue" class="java.util.concurrent.LinkedBlockingQueue"></bean>
+	<bean id="irPubSubShooter"
+		  class="com.foods.lifeloader.lifeloaderdummy.Publisher.PubSubShooter">
+		<constructor-arg type="java.lang.String" value="${IR_PUBSUB_TOPIC}" />
+		<property name="publisher" ref="${MSG_PUBLISHER_NAME:PubSubPublisher}" />
+	</bean>
+
+	<bean id="irPlainPublisher" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainPublisher">
+		<constructor-arg type="java.util.concurrent.BlockingQueue"
+						 ref="irbkqueue" />
+	</bean>
+
+	<bean id="irPlainConsumer" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainConsumer">
+		<constructor-arg type="java.util.concurrent.BlockingQueue"
+						 ref="irbkqueue" />
+		<constructor-arg type="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.SimpleTaskHandler"
+						 ref="irPubSubShooter" />
+		<constructor-arg ref="taskExecutor" />
+	</bean>
+	<!-- IR end-->
+
+
+	<!-- eqt-->
+	<bean id="eqbkqueue" class="java.util.concurrent.LinkedBlockingQueue"></bean>
+	<bean id="eqPubSubShooter"
+		  class="com.foods.lifeloader.lifeloaderdummy.Publisher.PubSubShooter">
+		<constructor-arg type="java.lang.String" value="${EQ_PUBSUB_TOPIC}" />
+		<property name="publisher" ref="${MSG_PUBLISHER_NAME:PubSubPublisher}" />
+	</bean>
+
+	<bean id="eqPlainPublisher" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainPublisher">
+		<constructor-arg type="java.util.concurrent.BlockingQueue"
+						 ref="eqbkqueue" />
+	</bean>
+
+	<bean id="eqPlainConsumer" class="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainConsumer">
+		<constructor-arg type="java.util.concurrent.BlockingQueue"
+						 ref="eqbkqueue" />
+		<constructor-arg type="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.SimpleTaskHandler"
+						 ref="eqPubSubShooter" />
+		<constructor-arg ref="taskExecutor" />
+	</bean>
+	<!-- eqt end-->
+
+	<bean id="CloudStorageHelper" class="com.foods.lifeloaderutility.CloudStorageHelper">
+		<constructor-arg type="java.lang.String" value="foodstest_service" />
+	</bean>
+
+	<bean id="ExtractF2BResult2CloudStorage" class="com.foods.measure.ExtractF2BResult2CloudStorage">
+		<constructor-arg type="java.lang.String" value="tradecore-stats" />
+		<constructor-arg type="java.lang.String" value="statsdb2" />
+	</bean>
+
+	<!--web server depends on the map to find the correct publisher to send message-->
+	<util:map id="PubShooterMap" value-type="com.maplequad.fo.ods.tradecore.lcm.utils.pubsub.PlainPublisher">
+		<!-- Map between String key and List -->
+		<entry key="fx-fwd" value-ref="FXPlainPublisher" />
+		<entry key="fi-irs" value-ref="irPlainPublisher" />
+		<entry key="cash-eq" value-ref="eqPlainPublisher" />
+	</util:map>
+
+	<!--List of all consumer for web server to start each consumer thread-->
+	<!-- No registration in the list -> no start! -->
+	<util:list id="ConsumerList">
+		<!--<ref bean="PlainConsumer" />-->
+		<ref bean="FXPlainConsumer" />
+		<ref bean="irPlainConsumer" />
+		<ref bean="eqPlainConsumer" />
+	</util:list>
+
+	<bean name="PubSubPublisher" class="com.foods.lifeloader.lifeloaderdummy.Publisher.PubSubPublisher" scope="prototype"/>
+	<bean name="MockPublisher" class="com.foods.lifeloader.lifeloaderdummy.Publisher.MockPublisher"/>
+
+</beans>
